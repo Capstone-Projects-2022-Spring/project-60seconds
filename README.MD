@@ -9,6 +9,9 @@ Aaron Scofield, Ryan Hardison, Xu Lyu, Zachary Preston, Zack Waxler
 npm start
 ```
 
-After starting Expo, you can visit the IP address in given in the console to view the project in realtime
-via a web browser or a mobile device/simulator. 
+After starting Expo, you can visit the IP address [http://localhost:19002](http://localhost:19002) in given in the console to view the project in realtime
+via a web browser or a mobile device/simulator. Useful commands include:
+- expo register
+- expo login
+- expo start:web
 
