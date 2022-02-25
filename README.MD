@@ -6,7 +6,8 @@ Aaron Scofield, Ryan Hardison, Xu Lyu, Zachary Preston, Zack Waxler
 
 ## Starting the Development Environment
 ```
-npm start
+npm install
+expo start
 ```
 
 After starting Expo, you can visit the IP address [http://localhost:19002](http://localhost:19002) in given in the console to view the project in realtime
