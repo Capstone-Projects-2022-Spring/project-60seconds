@@ -12,6 +12,9 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleLogin from "react-google-login";
 
+
+const clientId = "889429585915-hma88iu6bd4tk7qfmtj79b94nf6r9gp5.apps.googleusercontent.com";
+
 function Copyright(props) {
 	return (
 		<Typography
@@ -32,7 +35,8 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function Login() {
+
+export default function SignIn() {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
@@ -41,6 +45,14 @@ export default function Login() {
 			password: data.get("password"),
 		});
 	};
+
+	const onSuccess = (res) =>{
+		console.log('[Login in Success] currentUser: ', res.profileObj);
+		// refreshTokenSetup(res);
+	}
+	const onFailure = (res) =>{
+		console.log("[Login failed] res: ", res);
+	}
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -100,8 +112,11 @@ export default function Login() {
 					</Box>
 					<GoogleLogin
 						style={{ alignItems: "center" }}
-						clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+						clientId={clientId}
+						onSuccess={onSuccess}
+						onFailure={onFailure}
 						buttonText="Login With Google"
+
 					/>
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
