@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <View style={styles.container}>
       <div className="App">
-		<Login/>
+		    <Login/>
         <StatusBar style="auto" />
       </div>
     </View>

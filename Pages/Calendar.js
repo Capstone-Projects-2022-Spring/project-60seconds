@@ -6,7 +6,7 @@ export default function Calendar() {
   return (
     <View style={styles.container}>
       <div className="App">
-		<p>Calendar</p>
+        <p>Calendar Page</p>
         <StatusBar style="auto" />
       </div>
     </View>

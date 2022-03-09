@@ -6,7 +6,7 @@ export default function Record() {
   return (
     <View style={styles.container}>
       <div className="App">
-		<p>Calendar</p>
+        <p>Recorder Page</p>
         <StatusBar style="auto" />
       </div>
     </View>
