@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { purple } from '@mui/material/colors'
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar'
@@ -12,8 +11,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Container from '@mui/material/Container';
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-
-const pages = ['Calendar', 'Record', 'About'];
+import {BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 const appTheme = createTheme({
     palette: {
@@ -35,20 +33,18 @@ export default function Navbar() {
         setAnchorElNav(null);
     };
 
-    /*const changePage = (pageName) => {
-        console.log("swap to: " + pageName.toString());
-    }*/
-
     return (
         <ThemeProvider theme={appTheme}>
             <AppBar position="static">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
+                       
                         <AccessTimeIcon sx={{ mr: 1 }}/>
-                        <Typography variant="h6" noWrap component="div" sx={{mr: 2, display: { xs: 'none', md: 'flex' }}}>
-                            60 Seconds
-                        </Typography>
-                            
+                        <Link to="/">
+                            <Typography variant="h6" noWrap component="div" sx={{mr: 2, display: { xs: 'none', md: 'flex', color: '#fff' }}}>
+                                60 Seconds
+                            </Typography>
+                        </Link>
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                             <IconButton 
                                 size="large"
@@ -77,26 +73,48 @@ export default function Navbar() {
                                     display: {xs: 'block', md: 'none'}
                                 }}
                             >
-                                {pages.map((page) => (
-                                    <MenuItem key={page} onClick={handleCloseNavMenu}>
-                                        <Typography textAlign="center">{page}</Typography>
-                                    </MenuItem>
-                                ))}
+
+                                <MenuItem key={"Calendar"} onClick={handleCloseNavMenu}>
+                                    <Link to="/calendar" >
+                                        <Typography textAlign="center" color='#000'>Calendar</Typography>
+                                    </Link>
+                                </MenuItem>
+
+                                <MenuItem key={"Record"} onClick={handleCloseNavMenu}>
+                                    <Link to="/record">
+                                        <Typography textAlign="center" color='#000'>Record</Typography>
+                                    </Link>
+                                </MenuItem>
+
+                                <MenuItem key={"About"} onClick={handleCloseNavMenu}>
+                                    <Link to="/about">
+                                        <Typography textAlign="center" color='#000'>About</Typography>
+                                    </Link>
+                                </MenuItem>
+
                             </Menu>
                         </Box>
 
-                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                            {pages.map((page) => (
-                            <Button
-                                key={page}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                {page}
-                            </Button>
-                            ))}
-                        </Box>  
-                        <Button color="inherit">Login</Button>
+                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }}}>
+                            <Link to="/calendar">
+                                <Button key="Calendar" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                    Calendar
+                                </Button>
+                            </Link>
+                            <Link to="/record">
+                                <Button key="Record" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                    Record
+                                </Button>
+                            </Link>
+                            <Link to="/about">
+                                <Button key="About" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                    About
+                                </Button>
+                            </Link>
+                        </Box>
+                        <Link to="/login" className="menuLink" style={{color: '#fff'}}>
+                            <Button color="inherit">Login</Button>
+                        </Link>  
                     </Toolbar>
                 </Container>
             </AppBar>
