@@ -92,6 +92,11 @@ export default function Navbar() {
                                     </Link>
                                 </MenuItem>
 
+                                <MenuItem key={"Profile"} onClick={handleCloseNavMenu}>
+                                    <Link to="/Profile">
+                                        <Typography textAlign="center" color='#000'>Profile</Typography>
+                                    </Link>
+                                </MenuItem>
                             </Menu>
                         </Box>
 
@@ -109,6 +114,11 @@ export default function Navbar() {
                             <Link to="/about">
                                 <Button key="About" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     About
+                                </Button>
+                            </Link>
+                            <Link to="/Profile">
+                                <Button key="Profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                    Profile
                                 </Button>
                             </Link>
                         </Box>
