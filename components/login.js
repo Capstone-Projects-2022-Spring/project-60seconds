@@ -11,9 +11,10 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleLogin from "react-google-login";
+import Register from "./register";
 
-
-const clientId = "889429585915-hma88iu6bd4tk7qfmtj79b94nf6r9gp5.apps.googleusercontent.com";
+const clientId =
+	"889429585915-hma88iu6bd4tk7qfmtj79b94nf6r9gp5.apps.googleusercontent.com";
 
 function Copyright(props) {
 	return (
@@ -46,13 +47,13 @@ export default function Login() {
 		});
 	};
 
-	const onSuccess = (res) =>{
-		console.log('[Login in Success] currentUser: ', res.profileObj);
+	const onSuccess = (res) => {
+		console.log("[Login in Success] currentUser: ", res.profileObj);
 		// refreshTokenSetup(res);
-	}
-	const onFailure = (res) =>{
+	};
+	const onFailure = (res) => {
 		console.log("[Login failed] res: ", res);
-	}
+	};
 
 	return (
 		<ThemeProvider theme={theme}>
@@ -66,8 +67,8 @@ export default function Login() {
 						alignItems: "center",
 					}}
 				>
-					<Typography component="h1" variant="h5">
-						Sign in
+					<Typography component="h1" variant="h4">
+						Login
 					</Typography>
 					<Box
 						component="form"
@@ -107,16 +108,25 @@ export default function Login() {
 							variant="contained"
 							sx={{ mt: 3, mb: 2 }}
 						>
-							Sign In
+							Login
 						</Button>
 					</Box>
+					<hr style={{ color: "black", width: 300 }} />
+					<h4> Don't have an account?</h4>
+                    <Link underline="none" href="/Register">
+                    <Button
+						variant="outlined"
+						style={{ width: 180, height: 40 }}
+					>
+						Register Here
+					</Button>
+                    </Link>
+					<h5>OR</h5>
 					<GoogleLogin
-						style={{ alignItems: "center" }}
 						clientId={clientId}
 						onSuccess={onSuccess}
 						onFailure={onFailure}
 						buttonText="Login With Google"
-
 					/>
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
