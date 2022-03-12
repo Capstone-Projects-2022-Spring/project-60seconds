@@ -1,0 +1,47 @@
+// server.js
+// Main file; handles incoming API requests to the server
+
+const mysql = require('mysql');
+const creds = require('./creds');
+
+const connection = mysql.createConnection({
+  host: 'sixtyseconds.cvdaqyvuh6xj.us-east-1.rds.amazonaws.com', // host for connection
+  port: 3306, // default port for mysql is 3306
+  database: 'main', // database from which we want to connect out node application
+  user: creds.user, // username of the mysql connection
+  password: creds.password // password of the mysql connection
+});
+
+let checkCredentials = (connection, user, pass) => {
+  connection.connect();
+  connection.query('SELECT pass FROM users WHERE user LIKE ', function (error, results, fields) {
+
+  if (error) throw error;
+    console.log('The solution is: ', results[0].solution);
+  });
+
+  connection.end();
+}
+
+const express = require('express');
+const app = express();
+
+app.prefix = '/api';
+
+const port = 8080; // TODO: change for production
+
+app.get(app.prefix, (req, res) => {
+  res.send('Do nothing!');
+});
+
+
+app.post('/api/login', (req, res) => {
+  console.log(req);
+  res.end('received');
+});
+
+app.listen(port, () => {
+  console.log(`API server listening on port ${port}`);
+});
+
+module.exports = app;

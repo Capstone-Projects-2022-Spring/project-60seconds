@@ -10,5 +10,10 @@ npm-debug.*
 *.orig.*
 web-build/
 
+
+# backend
+creds.json
+server/creds.json
+
 # macOS
 .DS_Store
