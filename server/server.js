@@ -2,10 +2,13 @@
 // Main file; handles incoming API requests to the server
 
 // TODO: Needs a lot of refactoring; split logic between multiple files, fix vulnerabilities, clean things up
+// TODO: Fix glaring SQL injection vulnerabilities
 
 const mysql = require('mysql2');
 const AWS = require('aws-sdk');
 const fs = require('fs');
+const path = require('path')
+
 
 const creds = require('./creds');
 
@@ -17,50 +20,18 @@ const connection = mysql.createConnection({
   password: creds.dbPassword // password of the mysql connection
 });
 
-// TODO: Fix glaring SQL injection vulnerabilities
-// let checkCredentials = (username, password) => {
-//
-//
-//   let sql = `SELECT * FROM users WHERE username LIKE '${username}' AND password LIKE '${password}'`;
-//   let check = false;
-//
-//   connection.query(sql, function (err, result, fields) {
-//     if (err) throw err;
-//
-//     let parsedResult = JSON.parse(JSON.stringify(result))[0];
-//     console.log(result.length);
-//
-//     if (result.length === 1) {
-//       check = true;
-//     }
-//   });
-//
-//   return check;
-// }
-
-// let checkAccountExists = (dbConnection, username) => {
-//   let sql = `SELECT * FROM users WHERE username LIKE '${username}'`;
-//
-//   dbConnection.query(sql, function (err, result, fields) {
-//     if (err) throw err;
-//     let parsedResult = JSON.parse(JSON.stringify(result))[0];
-//
-//     console.log(parsedResult);
-//
-//     if (parsedResult === undefined) {
-//       return false;
-//     }
-//
-//     return true;
-//   });
-// }
-
 const express = require('express');
 const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(fileUpload());
+
+// Serve static files from /public
+app.use(express.static('public'))
+
 app.prefix = '/api';
 
 app.get(app.prefix, (req, res) => {
@@ -123,6 +94,62 @@ app.post('/api/create_account', (req, res) => {
             .end();
         });
     }
+  });
+});
+
+app.post('/api/upload', (req, res) => {
+  let username = req.body.username;
+
+  if (username === undefined) {
+    res.status(400).end('Error: no user specified');
+  }
+
+  // Send a 400 error code if no files included
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send('No files were uploaded.');
+  }
+
+  baseURL = 'http://54.226.36.70/audio/';
+
+  audioFile = req.files.audio;
+  uploadPath = __dirname + '/public/audio/' + audioFile.name;
+
+  audioFile.mv(uploadPath, function(err) {
+    if (err)
+      return res.status(500).send(err);
+
+    let audioObject = {
+      "link": baseURL + audioFile.name,
+      "creator": username
+    }
+
+    let statement = `INSERT INTO audio (link, creator) VALUES ('${audioObject.link}', '${audioObject.creator}')`;
+    console.log('Running statement ' + statement);
+    connection.query(statement, function (err, result, fields) {
+
+      res.status(200);
+      res.end(JSON.stringify(audioObject));
+    });
+  });
+
+});
+
+app.post('/api/get_links', (req, res) => {
+  let username = req.body.username;
+
+  if (username === undefined) {
+    res.status(400).end('Error: no user specified');
+  }
+
+  let statement = `SELECT * FROM audio WHERE creator LIKE '${username}'`;
+  console.log('Running statement ' + statement);
+  connection.query(statement, function (err, result, fields) {
+    // User created, return 200 OK
+    console.log('Query executed');
+    console.log(result);
+
+    res.status(200)
+      .end();
   });
 });
 
