@@ -12,6 +12,8 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import GoogleLogin from "react-google-login";
 import Register from "./register";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const clientId =
 	"889429585915-hma88iu6bd4tk7qfmtj79b94nf6r9gp5.apps.googleusercontent.com";
@@ -36,15 +38,34 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-
 export default function Login() {
+	const navigate = useNavigate();
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
 		console.log({
-			email: data.get("email"),
+			username: data.get("username"),
 			password: data.get("password"),
 		});
+
+		axios
+			.post("http://54.226.36.70/api/login", {
+				username: data.get("username"),
+				password: data.get("password"),
+			})
+			.then(function (response) {
+				console.log(response);
+				alert(
+					"User: " + data.get("username") + " successfully logged in"
+				);
+				navigate("/Profile", {
+					state: { username: data.get("username") },
+				});
+			})
+			.catch(function (error) {
+				console.log(error);
+				alert("Error: " + error);
+			});
 	};
 
 	const onSuccess = (res) => {
@@ -80,10 +101,10 @@ export default function Login() {
 							margin="normal"
 							required
 							fullWidth
-							id="email"
-							label="Email Address"
-							name="email"
-							autoComplete="email"
+							id="username"
+							label="Username"
+							name="username"
+							autoComplete="username"
 							autoFocus
 						/>
 						<TextField
@@ -113,14 +134,14 @@ export default function Login() {
 					</Box>
 					<hr style={{ color: "black", width: 300 }} />
 					<h4> Don't have an account?</h4>
-                    <Link underline="none" href="/Register">
-                    <Button
-						variant="outlined"
-						style={{ width: 180, height: 40 }}
-					>
-						Register Here
-					</Button>
-                    </Link>
+					<Link underline="none" href="/Register">
+						<Button
+							variant="outlined"
+							style={{ width: 180, height: 40 }}
+						>
+							Register Here
+						</Button>
+					</Link>
 					<h5>OR</h5>
 					<GoogleLogin
 						clientId={clientId}
