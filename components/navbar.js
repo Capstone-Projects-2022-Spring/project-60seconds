@@ -40,7 +40,7 @@ export default function Navbar() {
                     <Toolbar disableGutters>
                        
                         <AccessTimeIcon sx={{ mr: 1 }}/>
-                        <Link to="/">
+                        <Link to="/" style={{ textDecoration: "none" }}>
                             <Typography variant="h6" noWrap component="div" sx={{mr: 2, display: { xs: 'none', md: 'flex', color: '#fff' }}}>
                                 60 Seconds
                             </Typography>
@@ -75,25 +75,25 @@ export default function Navbar() {
                             >
 
                                 <MenuItem key={"Calendar"} onClick={handleCloseNavMenu}>
-                                    <Link to="/calendar" >
+                                    <Link to="/calendar" style={{ textDecoration: "none" }}>
                                         <Typography textAlign="center" color='#000'>Calendar</Typography>
                                     </Link>
                                 </MenuItem>
 
                                 <MenuItem key={"Record"} onClick={handleCloseNavMenu}>
-                                    <Link to="/record">
+                                    <Link to="/record" style={{ textDecoration: "none" }}>
                                         <Typography textAlign="center" color='#000'>Record</Typography>
                                     </Link>
                                 </MenuItem>
 
                                 <MenuItem key={"About"} onClick={handleCloseNavMenu}>
-                                    <Link to="/about">
+                                    <Link to="/about" style={{ textDecoration: "none" }}>
                                         <Typography textAlign="center" color='#000'>About</Typography>
                                     </Link>
                                 </MenuItem>
 
                                 <MenuItem key={"Profile"} onClick={handleCloseNavMenu}>
-                                    <Link to="/Profile">
+                                    <Link to="/Profile" style={{ textDecoration: "none" }}>
                                         <Typography textAlign="center" color='#000'>Profile</Typography>
                                     </Link>
                                 </MenuItem>
@@ -101,28 +101,28 @@ export default function Navbar() {
                         </Box>
 
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }}}>
-                            <Link to="/calendar">
+                            <Link to="/calendar" style={{ textDecoration: "none" }}>
                                 <Button key="Calendar" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Calendar
                                 </Button>
                             </Link>
-                            <Link to="/record">
+                            <Link to="/record" style={{ textDecoration: "none" }}>
                                 <Button key="Record" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Record
                                 </Button>
                             </Link>
-                            <Link to="/about">
+                            <Link to="/about" style={{ textDecoration: "none" }}>
                                 <Button key="About" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     About
                                 </Button>
                             </Link>
-                            <Link to="/Profile">
+                            <Link to="/Profile" style={{ textDecoration: "none" }}>
                                 <Button key="Profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Profile
                                 </Button>
                             </Link>
                         </Box>
-                        <Link to="/login" className="menuLink" style={{color: '#fff'}}>
+                        <Link to="/login" className="menuLink" style={{color: '#fff', textDecoration: "none"}}>
                             <Button color="inherit">Login</Button>
                         </Link>  
                     </Toolbar>

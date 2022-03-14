@@ -1,7 +1,17 @@
 import * as React from "react";
 import ProfilePic from '../assets/icon.png'
+import { useLocation } from "react-router-dom";
 
 export default function Profile() {
+
+    const location = useLocation();
+	const [username, setUsername] = React.useState("not login");
+	React.useEffect(() => {
+		if (location.state) {
+			setUsername(location.state.username);
+		}
+	}, []);
+
     return (
         <div className="user-profile">
             <div className="container">
@@ -14,7 +24,7 @@ export default function Profile() {
                             </div>
                             <div className="card-body">
                                 <h2>Basic Information</h2>
-                                <p className="mb-0">User Name</p>
+                                <p className="mb-0">{username}</p>
                                 <p className="mb-0">Description</p>
                                 <p className="mb-0">Section:</p>
                             </div>
