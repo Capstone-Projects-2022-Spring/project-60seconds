@@ -1,31 +1,32 @@
-import React from 'react';
+import { Text, View } from 'react-native';
 import { Audio } from 'expo-av';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import StopIcon from '@mui/icons-material/Stop';
-import MicIcon from '@mui/icons-material/Mic';
+import * as React from 'react';
+import { Button } from 'react-native';
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import { Recording } from 'expo-av/build/Audio';
 
-function recorder() {
+
+export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
 
 	async function startRecording() {
 		try {
-		  console.log('Requesting permissions..');
-		  await Audio.requestPermissionsAsync();
-		  await Audio.setAudioModeAsync({
+		console.log('Requesting permissions..');
+		await Audio.requestPermissionsAsync();
+		await Audio.setAudioModeAsync({
 			allowsRecordingIOS: true,
 			playsInSilentModeIOS: true,
-		  }); 
-		  console.log('Starting recording..');
-		  const { recording } = await Audio.Recording.createAsync(
-			 Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-		  );
-		  setRecording(recording);
-		  console.log('Recording started');
+		}); 
+		console.log('Starting recording..');
+		const { recording } = await Audio.Recording.createAsync(
+			Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+		);
+		setRecording(recording);
+		console.log('Recording started');
 		} catch (err) {
-		  console.error('Failed to start recording', err);
+		console.error('Failed to start recording', err);
 		}
 	}
 
@@ -33,18 +34,50 @@ function recorder() {
 		console.log('Stopping recording..');
 		setRecording(undefined);
 		await recording.stopAndUnloadAsync();
-		const uri = recording.getURI(); 
-		console.log('Recording stopped and stored at', uri);
+		const localUri = recording.getURI(); 
+		
+		console.log('Recording stopped and stored at', localUri);
+
+		/*
+		let formRequest = new FormData();
+		formRequest.append('audio', {
+			uri: localUri,
+			name: 'file.mp3',
+			type: 'audio/mp3'
+		})
+		formRequest.append('username', 'Aaron');
+
+		return await fetch('http://54.226.36.70/api/upload', {
+			method: 'POST',
+			body: formRequest,
+			headers: {
+			  'content-type': 'multipart/form-data',
+			},
+		  }).catch((error) => {
+			  console.log(error);
+		  });
+		*/
 	}
 
 	return (
-		<Container maxWidth="xl" align="center">
-			<Typography sx={{mt: 5}}>Recording Component</Typography>
-			<PlayArrowIcon sx={{ mr: 1 }}/>
-			<StopIcon sx={{ mr: 1 }} onClick={stopRecording}/>
-			<MicIcon sx={{ mr: 1 }} onClick={startRecording}/>
+		<Container component="main" maxWidth="sm">
+			<Box
+				sx={{
+					marginTop: 8,
+					display: "flex",
+					flexDirection: "column",
+					alignItems: "center",
+				}}>
+				<Button
+					title={recording ? 'Stop Recording' : 'Start Recording'}
+					onPress={recording ? stopRecording : startRecording}
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={{ mt: 3, mb: 2 }}
+				/>
+			</Box>
 		</Container>
-  	)
+		
+	);
 }
-
-export default recorder
