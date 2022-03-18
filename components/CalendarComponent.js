@@ -50,11 +50,11 @@ export default function calendar() {
         for(let day = 0; day < 7; day++){
             const cloneDate = currentDate;
             week.push(
-                <div key={cloneDate+Date()}
-                    className={`day ${
-                        isSameMonth(currentDate, activeDate) ? "" : "inactiveDay"
-                    } ${isSameDay(currentDate, selectedDate) ? "selectedDay" : ""}
-                    ${isSameDay(currentDate, new Date()) ? "today" : ""}}`}
+                <div key={currentDate}
+                    className={`day 
+                        ${isSameMonth(currentDate, activeDate) ? "" : "inactiveDay"} 
+                        ${isSameDay(currentDate, selectedDate) ? "selectedDay" : ""}
+                        ${isSameDay(currentDate, new Date()) ? "today" : ""}}`}
                     onClick={() => {
                         //if new selected date is not in current month displayed
                         if(!isSameMonth(cloneDate, activeDate)){
@@ -62,23 +62,26 @@ export default function calendar() {
                                 //if selected date is from previous month
                                 setActiveDate(subMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
+                                console.log(cloneDate);
                             } else {
                                 //if selected date is from next month
                                 setActiveDate(addMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
+                                console.log(cloneDate);
                             }
                         } else {
                             //if selected date is in current month
                             setSelectedDate(cloneDate);
+                            console.log(cloneDate);
                         }
-                    }}
+                    }}  
                 >
                     {format(currentDate, "d")}
                 </div>
             );
             currentDate = addDays(currentDate, 1);
         }
-        return <>{week}</>;
+        return <React.Fragment key={Math.random() /*temporary key*/}>{week}</React.Fragment>;
     }
 
     const getDates = () => {
