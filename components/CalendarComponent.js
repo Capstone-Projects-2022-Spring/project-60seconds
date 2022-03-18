@@ -81,7 +81,7 @@ export default function calendar() {
                             //if selected date is in current month
                             setSelectedDate(cloneDate);
                             //console.log(cloneDate);
-                            parentToChild(cloneDate.toString());
+                            parentToChild(cloneDate);
                         }
                     }}  
                 >
