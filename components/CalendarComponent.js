@@ -2,11 +2,17 @@ import React, {useState} from "react";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, subMonths, addMonths, isBefore } from "date-fns";
+import Day from '../components/day';
 
 export default function calendar() {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeDate, setActiveDate] = useState(new Date())
+    const [data, setData] = useState('');
+
+    const parentToChild = (dateToSet) => {
+        setData(dateToSet);
+    }
 
     const getHeader = () => {
         return (
@@ -62,17 +68,20 @@ export default function calendar() {
                                 //if selected date is from previous month
                                 setActiveDate(subMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
-                                console.log(cloneDate);
+                                //console.log(cloneDate);
+                                parentToChild(cloneDate.toString());
                             } else {
                                 //if selected date is from next month
                                 setActiveDate(addMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
-                                console.log(cloneDate);
+                                //console.log(cloneDate);
+                                parentToChild(cloneDate.toString());
                             }
                         } else {
                             //if selected date is in current month
                             setSelectedDate(cloneDate);
-                            console.log(cloneDate);
+                            //console.log(cloneDate);
+                            parentToChild(cloneDate.toString());
                         }
                     }}  
                 >
@@ -107,6 +116,7 @@ export default function calendar() {
             {getHeader()}
             {getWeekDaysNames()}
             {getDates()}
+            <Day parentToChild={data}/>
         </div>
     )
 }
