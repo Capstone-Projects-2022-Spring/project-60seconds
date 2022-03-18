@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, subMonths, addMonths } from "date-fns";
+import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, subMonths, addMonths, isBefore } from "date-fns";
 
 export default function calendar() {
 
@@ -25,7 +25,7 @@ export default function calendar() {
                 />
                 <ChevronRightIcon 
                     className="navIcon"
-                    onClick={() => setActiveDate(subMonths(activeDate, 1))}
+                    onClick={() => setActiveDate(addMonths(activeDate, 1))}
                 />
                 <h2 className="currentMonth">{format(activeDate, "MMMM yyyy")}</h2>
             </div>
@@ -50,13 +50,27 @@ export default function calendar() {
         for(let day = 0; day < 7; day++){
             const cloneDate = currentDate;
             week.push(
-                <div key={currentDate}
+                <div key={cloneDate+Date()}
                     className={`day ${
                         isSameMonth(currentDate, activeDate) ? "" : "inactiveDay"
                     } ${isSameDay(currentDate, selectedDate) ? "selectedDay" : ""}
                     ${isSameDay(currentDate, new Date()) ? "today" : ""}}`}
                     onClick={() => {
-                        setSelectedDate(cloneDate);
+                        //if new selected date is not in current month displayed
+                        if(!isSameMonth(cloneDate, activeDate)){
+                            if(isBefore(cloneDate, activeDate)){
+                                //if selected date is from previous month
+                                setActiveDate(subMonths(activeDate, 1));
+                                setSelectedDate(cloneDate);
+                            } else {
+                                //if selected date is from next month
+                                setActiveDate(addMonths(activeDate, 1));
+                                setSelectedDate(cloneDate);
+                            }
+                        } else {
+                            //if selected date is in current month
+                            setSelectedDate(cloneDate);
+                        }
                     }}
                 >
                     {format(currentDate, "d")}
@@ -86,7 +100,7 @@ export default function calendar() {
     };
 
     return(
-        <div>
+        <div className="calendar">
             {getHeader()}
             {getWeekDaysNames()}
             {getDates()}
