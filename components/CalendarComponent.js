@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSameMonth, isSameDay, subMonths, addMonths, isBefore } from "date-fns";
+import Container from "@mui/material/Container";
+import Box from '@mui/material/Box'
 import Day from '../components/day';
 
 export default function calendar() {
@@ -113,10 +115,18 @@ export default function calendar() {
 
     return(
         <div className="calendar">
-            {getHeader()}
-            {getWeekDaysNames()}
-            {getDates()}
-            <Day parentToChild={data}/>
+            <Box sx={{
+                flexDirection: "row",
+                display: "flex", 
+                alignItems: 'center'
+            }}>
+                <Container maxWidth="md">
+                    {getHeader()}
+                    {getWeekDaysNames()}
+                    {getDates()}
+                </Container>
+                <Day parentToChild={data}/>
+            </Box>
         </div>
     )
 }
