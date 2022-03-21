@@ -4,7 +4,7 @@ import styles from '../App.style';
 
 export default function About() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
 		<p>About Page</p>
         <StatusBar style="auto" />

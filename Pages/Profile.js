@@ -5,7 +5,7 @@ import Profile from '../components/profile'
 
 export default function ProfilePage() {
     return (
-        <View style={styles.container}>
+        <View style={styles.pages}>
             <div className="App">
                 <Profile/>
                 <StatusBar style="auto" />

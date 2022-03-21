@@ -10,5 +10,8 @@ export default StyleSheet.create({
       backgroundColor: '#ededed',
       flexDirection: 'column',
       marginRight: 50,
+    }, 
+    pages: {
+      alignItems: 'center',
     }
   });

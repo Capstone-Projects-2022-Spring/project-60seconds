@@ -5,7 +5,7 @@ import CalendarComponent from '../components/CalendarComponent';
 
 export default function Calendar() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
         <CalendarComponent/>
         <StatusBar style="auto" />
