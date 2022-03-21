@@ -3,8 +3,11 @@ import Container from "@mui/material/Container";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Link from "@mui/material/Link"
-import aaronPhoto from '../assets/aaron.png'
+import Link from "@mui/material/Link";
+import aaronPhoto from '../assets/aaron.png';
+import ryanPhoto from '../assets/ryan.png';
+import zachPhoto from '../assets/zach.jpg';
+import xuPhoto from '../assets/xu.jpg'
 import styles from '../App.style';
 
 export default function About() {
@@ -49,6 +52,48 @@ export default function About() {
             <Typography>Aaron Scofield</Typography>
             <Typography>scofield@temple.edu</Typography>
             <Typography><Link href="https://github.com/aaronscofield">GitHub</Link></Typography>
+          </Box>
+          <Box
+            sx={{
+              marginBottom: 3,
+              marginRight: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+				  >
+            <img src={ryanPhoto} alt="Ryan Hardison" height={200} width={200} padding={50}/>
+            <Typography>Ryan Hardison</Typography>
+            <Typography>tuj02293@temple.edu</Typography>
+            <Typography><Link href="https://github.com/rhardison455">GitHub</Link></Typography>
+          </Box>
+          <Box
+            sx={{
+              marginBottom: 3,
+              marginRight: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+				  >
+            <img src={zachPhoto} alt="Zach Preston" height={200} width={200} padding={50}/>
+            <Typography>Zach Preston</Typography>
+            <Typography>zprestoz@protonmail.com</Typography>
+            <Typography><Link href="https://github.com/ZacharyWilliamPreston">GitHub</Link></Typography>
+          </Box>
+          <Box
+            sx={{
+              marginBottom: 3,
+              marginRight: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+				  >
+            <img src={xuPhoto} alt="Xu Lyu" height={200} width={200} padding={50}/>
+            <Typography>Xu Lyu</Typography>
+            <Typography>tuj85073@temple.edu</Typography>
+            <Typography><Link href="https://github.com/tuj85073">GitHub</Link></Typography>
           </Box>
         </Box>
       </Container>
