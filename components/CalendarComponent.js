@@ -10,7 +10,7 @@ export default function calendar() {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeDate, setActiveDate] = useState(new Date())
-    const [data, setData] = useState('');
+    const [data, setData] = useState(new Date());
 
     const parentToChild = (dateToSet) => {
         setData(dateToSet);

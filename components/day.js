@@ -9,7 +9,7 @@ export default function Day({parentToChild}){
     return(
         <div className="dayBox">
             <View style={styles.dayBox}>
-                <p>date returned to child component: {parentToChild.toString()}</p>
+                <p>{parentToChild.toString()}</p>
             </View>
         </div>
     )
