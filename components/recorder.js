@@ -6,6 +6,8 @@ import Container from "@mui/material/Container";
 import { Recording } from 'expo-av/build/Audio';
 import { StatusBar } from 'expo-status-bar';
 
+import axios from 'axios';
+
 
 export default function recorder() {
 
@@ -19,7 +21,7 @@ export default function recorder() {
 		await Audio.setAudioModeAsync({
 			allowsRecordingIOS: true,
 			playsInSilentModeIOS: true,
-		}); 
+		});
 		console.log('Starting recording..');
 		const { recording } = await Audio.Recording.createAsync(
 			Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
@@ -31,6 +33,34 @@ export default function recorder() {
 		}
 	}
 
+	async function sendToServer(recording, username) {
+		const fileName = '60seconds-audio.mp3'
+
+		// SO snippet
+		let blobToFile = function(blob, fileName) {
+			const file = new File([blob], fileName, { type: blob.type });
+
+			return file;
+		}
+
+		// Get URI of the recording
+		let audioURI = recording.getURI();
+
+		// Convert URI to blob
+		let audioBlob = await fetch(audioURI).then(r => r.blob());
+
+		// Convert blob to file
+		let audioFile = blobToFile(audioBlob, fileName);
+
+		let uploadData = new FormData();
+		uploadData.append('username', username);
+		uploadData.append('audio', audioFile);
+
+		let apiUploadPath = 'http://54.226.36.70/api/upload';
+		axios.post(apiUploadPath, uploadData);
+	}
+
+
 	async function stopRecording() {
 		console.log('Stopping recording..');
 		setRecording(undefined);
@@ -39,7 +69,7 @@ export default function recorder() {
 		console.log("recording length: " + status.durationMillis);
 
 		let updatedRecordings = [...recordings];
-		
+
 		updatedRecordings.push({
 			sound: sound,
 			duration: getDurationFormatted(status.durationMillis),
@@ -48,38 +78,11 @@ export default function recorder() {
 
 		setRecordings(updatedRecordings);
 
-		
-		let formRequest = new FormData();
-		formRequest.append('audio', {
-			uri: recording.getURI,
-			name: 'file.mp3',
-			type: 'audio/mp3'
-		})
-		formRequest.append('username', 'testRegister');
-
-		return await fetch('http://54.226.36.70/api/upload', {
-			method: 'POST',
-			body: formRequest,
-			
-		  }).then(data => console.log(data)).then(data => console.log(data))
-		  .catch((error) => {
-			  console.log(error);
-		  });
-
-		  /*axios.post('http://54.226.36.70/api/upload', {
-			uri: recording.getURI,
-			name: 'file.mp3',
-			type: 'audio/mp3'
-		  })
-		  .then(function (response) {
-			console.log(response);
-		  })
-		  .catch(function (error) {
-			console.log(error);
-		  });*/
-
+    // Send to server
+		sendToServer(recording, 'testUsername');
 
 	}
+
 
 	function getDurationFormatted(millis) {
 		console.log("Millis is: " + millis);
@@ -121,7 +124,7 @@ export default function recorder() {
 				{getRecordingLines()}
 			</Box>
 		</Container>
-		
+
 	);
 }
 
