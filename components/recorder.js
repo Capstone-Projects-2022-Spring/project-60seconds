@@ -56,7 +56,7 @@ export default function recorder() {
 		uploadData.append('username', username);
 		uploadData.append('audio', audioFile);
 
-		let apiUploadPath = 'http://localhost/api/upload';
+		let apiUploadPath = 'http://54.226.36.70/api/upload';
 		axios.post(apiUploadPath, uploadData);
 	}
 
