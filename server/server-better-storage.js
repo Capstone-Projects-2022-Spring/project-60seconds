@@ -157,7 +157,7 @@ app.get('/api/get_links', (req, res) => {
     res.status(400).end('Error: no date specified.');
   }
 
-  let statement = `SELECT * FROM audio WHERE creator LIKE '${username}' AND upload_timetamp = '${date}'`;
+  let statement = `SELECT * FROM audio WHERE creator LIKE '${username}' AND upload_date = '${date}'`;
   console.log('Running statement ' + statement);
   connection.query(statement, function (err, result, fields) {
     // User created, return 200 OK
