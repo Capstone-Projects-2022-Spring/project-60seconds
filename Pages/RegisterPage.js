@@ -5,7 +5,7 @@ import Register from '../components/regiter'
 
 export default function RegisterPage() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
 		    <Register/>
         <StatusBar style="auto" />

@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
-import styles from '../App.style';
+import { View } from 'react-native';
+import styles from '../styles/calendar.css';
+import CalendarComponent from '../components/CalendarComponent';
 
 export default function Calendar() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
-        <p>Calendar Page</p>
+        <CalendarComponent/>
         <StatusBar style="auto" />
       </div>
     </View>

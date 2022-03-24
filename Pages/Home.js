@@ -4,9 +4,9 @@ import styles from '../App.style';
 
 export default function Home() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
-		<p>Home Page</p>
+		  <p>Home Page</p>
         <StatusBar style="auto" />
       </div>
     </View>

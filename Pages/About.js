@@ -13,7 +13,7 @@ import styles from '../App.style';
 
 export default function About() {
   return (
-    <View style={styles.container}>
+    <View style={styles.pages}>
       <div className="App">
 		  <Container component="main" maxWidth="lg">
 				<CssBaseline />
