@@ -147,8 +147,8 @@ app.post('/api/upload', (req, res) => {
 
 });
 
-app.post('/api/get_links', (req, res) => {
-  let username = req.body.username;
+app.get('/api/get_links', (req, res) => {
+  let username = req.query.username;
 
   if (username === undefined) {
     res.status(400).end('Error: no user specified');
@@ -162,7 +162,7 @@ app.post('/api/get_links', (req, res) => {
     console.log(result);
 
     res.status(200)
-      .end();
+      .end(JSON.stringify(result));
   });
 });
 
