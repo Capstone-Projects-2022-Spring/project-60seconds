@@ -24,6 +24,7 @@ export default function calendar() {
                     onClick={() => {
                         setSelectedDate(new Date());
                         setActiveDate(new Date());
+                        parentToChild(new Date());
                     }}
                 >Today
                 </div>
@@ -71,13 +72,13 @@ export default function calendar() {
                                 setActiveDate(subMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
                                 //console.log(cloneDate);
-                                parentToChild(cloneDate.toString());
+                                parentToChild(cloneDate);
                             } else {
                                 //if selected date is from next month
                                 setActiveDate(addMonths(activeDate, 1));
                                 setSelectedDate(cloneDate);
                                 //console.log(cloneDate);
-                                parentToChild(cloneDate.toString());
+                                parentToChild(cloneDate);
                             }
                         } else {
                             //if selected date is in current month
