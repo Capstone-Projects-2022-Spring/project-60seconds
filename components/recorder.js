@@ -7,6 +7,7 @@ import { Recording } from 'expo-av/build/Audio';
 import { StatusBar } from 'expo-status-bar';
 
 import axios from 'axios';
+import { duration } from '@mui/material';
 
 
 export default function recorder() {
@@ -16,20 +17,20 @@ export default function recorder() {
 
 	async function startRecording() {
 		try {
-		console.log('Requesting permissions..');
-		await Audio.requestPermissionsAsync();
-		await Audio.setAudioModeAsync({
-			allowsRecordingIOS: true,
-			playsInSilentModeIOS: true,
-		});
-		console.log('Starting recording..');
-		const { recording } = await Audio.Recording.createAsync(
-			Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-		);
-		setRecording(recording);
-		console.log('Recording started');
+			console.log('Requesting permissions..');
+			await Audio.requestPermissionsAsync();
+			await Audio.setAudioModeAsync({
+				allowsRecordingIOS: true,
+				playsInSilentModeIOS: true,
+			});
+			console.log('Starting recording..');
+			const { recording } = await Audio.Recording.createAsync(
+				Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+			);
+			setRecording(recording);
+			console.log('Recording started');
 		} catch (err) {
-		console.error('Failed to start recording', err);
+			console.error('Failed to start recording', err);
 		}
 	}
 
@@ -37,7 +38,7 @@ export default function recorder() {
 		const fileName = '60seconds-audio.mp3'
 
 		// SO snippet
-		let blobToFile = function(blob, fileName) {
+		let blobToFile = function (blob, fileName) {
 			const file = new File([blob], fileName, { type: blob.type });
 
 			return file;
@@ -62,42 +63,55 @@ export default function recorder() {
 
 
 	async function stopRecording() {
+
+		let updatedRecordings = [...recordings];
+
 		console.log('Stopping recording..');
 		setRecording(undefined);
 		await recording.stopAndUnloadAsync();
 		const { sound, status } = await recording.createNewLoadedSoundAsync();
-		console.log("recording length: " + status.durationMillis);
 
-		let updatedRecordings = [...recordings];
+		recording.getStatusAsync()
+			.then(function (result) {
+				console.log("The duration is: " + result.durationMillis)
+				updatedRecordings.push({
+					sound: sound,
+					duration: getDurationFormatted(result.durationMillis),
+					file: recording.getURI()
+				});
+			})
+			.catch(failureCallback);
 
-		updatedRecordings.push({
-			sound: sound,
-			duration: getDurationFormatted(status.durationMillis),
-			file: recording.getURI()
-		});
+		function failureCallback(error) {
+			console.error("Error generating audio file: " + error);
+		}
+
+		
 
 		setRecordings(updatedRecordings);
 
-    // Send to server
+		// Send to server
 		sendToServer(recording, 'testUsername');
 
 	}
 
 
+
 	function getDurationFormatted(millis) {
-		console.log("Millis is: " + millis);
+		console.log("FORMATTING..." + millis);
 		const minutes = millis / 1000 / 60;
 		const minutesDisplay = Math.floor(minutes);
 		const seconds = Math.round((minutes - minutesDisplay) * 60);
 		const secondsDisplay = seconds < 10 ? `0${seconds}` : seconds;
-		return `${minutesDisplay}:${secondsDisplay}`;
+		var formattedDuration = `${minutesDisplay}:${secondsDisplay}`;
+		return formattedDuration;
 	}
 
 	function getRecordingLines() {
 		return recordings.map((recordingLine, index) => {
 			return (
 				<View key={index} style={StyleSheet.row}>
-					<Text style={styles.fill}>Recording {index+1} - {recordingLine.duration}</Text>
+					<Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
 					<Button style={styles.button} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
 				</View>
 			);
