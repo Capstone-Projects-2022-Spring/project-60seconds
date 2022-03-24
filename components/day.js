@@ -10,13 +10,14 @@ export default function Day({parentToChild}){
     
     axios.get('http://54.226.36.70/api/get_links', {
         params: {
-          username: "tester"
+          username: "testUsername",
+          date: '2022-03-24'
         }
       })
       .then(function (response) {
-        console.log(response.data[0].link);
-        let recordingDate = new Date(response.data[0].time_created);
-        console.log('recording date: ' + recordingDate);
+        console.log(response.data);
+        //let recordingDate = new Date(response.data[0].time_created);
+        //console.log('recording date: ' + recordingDate);
       }) 
       .catch(function (error) {
         console.log(error);
