@@ -1,23 +1,21 @@
 import React, {useState} from "react";
 import { View } from 'react-native';
-import Container from "@mui/material/Container";
 import styles from '../App.style';
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import axios from "axios";
 
 export default function Day({parentToChild}){
     
-    axios.get('http://54.226.36.70/api/get_links', {
+    //querying backend for links based on day. to be implemented in new branch. 
+
+    /*axios.get('http://54.226.36.70/api/get_links', {
         params: {
           username: "testUsername",
           date: '2022-03-24'
         }
       })
       .then(function (response) {
-        console.log(response.data);
-        //let recordingDate = new Date(response.data[0].time_created);
-        //console.log('recording date: ' + recordingDate);
+        let link = response.data[0].link
+        console.log(response.data[0].link);
       }) 
       .catch(function (error) {
         console.log(error);
@@ -25,6 +23,7 @@ export default function Day({parentToChild}){
       .then(function () {
         // always executed
       });
+      */
 
     return(
         <div className="dayBox">
