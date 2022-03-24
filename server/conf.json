@@ -1,0 +1,7 @@
+{
+  "port": 80,
+  "host": "localhost",
+  "dbHost": "sixtyseconds.cvdaqyvuh6xj.us-east-1.rds.amazonaws.com",
+  "dbName": "main",
+  "version": "0.0"
+}
