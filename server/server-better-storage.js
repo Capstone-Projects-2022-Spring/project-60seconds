@@ -131,12 +131,10 @@ app.post('/api/upload', (req, res) => {
     let audioObject = {
       "link": baseURL + uniqueFileName,
       "creator": username,
-      "time_created": Date.now(),
       "tags": ""
-
     }
 
-    let statement = `INSERT INTO audio (link, creator, time_created, tags) VALUES ('${audioObject.link}', '${audioObject.creator}', ${audioObject.time_created}, '${audioObject.tags}')`;
+    let statement = `INSERT INTO audio (link, creator, tags) VALUES ('${audioObject.link}', '${audioObject.creator}', '${audioObject.tags}')`;
     console.log('Running statement ' + statement);
     connection.query(statement, function (err, result, fields) {
 
