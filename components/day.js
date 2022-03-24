@@ -10,11 +10,11 @@ export default function Day({parentToChild}){
     
     axios.get('http://54.226.36.70/api/get_links', {
         params: {
-          username: "testUsername"
+          username: "tester"
         }
       })
       .then(function (response) {
-        console.log(response);
+        console.log(response.data[0].link);
       })
       .catch(function (error) {
         console.log(error);
