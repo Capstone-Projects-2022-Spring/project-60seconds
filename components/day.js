@@ -15,7 +15,9 @@ export default function Day({parentToChild}){
       })
       .then(function (response) {
         console.log(response.data[0].link);
-      })
+        let recordingDate = new Date(response.data[0].time_created);
+        console.log('recording date: ' + recordingDate);
+      }) 
       .catch(function (error) {
         console.log(error);
       })
