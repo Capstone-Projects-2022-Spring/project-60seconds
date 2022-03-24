@@ -8,13 +8,14 @@ import aaronPhoto from '../assets/aaron.png';
 import ryanPhoto from '../assets/ryan.png';
 import zachPhoto from '../assets/zach.jpg';
 import xuPhoto from '../assets/xu.jpg'
+import zackPhoto from '../assets/zack.jpg'
 import styles from '../App.style';
 
 export default function About() {
   return (
     <View style={styles.container}>
       <div className="App">
-		  <Container component="main" maxWidth="md">
+		  <Container component="main" maxWidth="lg">
 				<CssBaseline />
 				<Box
 					sx={{
@@ -94,6 +95,20 @@ export default function About() {
             <Typography>Xu Lyu</Typography>
             <Typography>tuj85073@temple.edu</Typography>
             <Typography><Link href="https://github.com/tuj85073">GitHub</Link></Typography>
+          </Box>
+          <Box
+            sx={{
+              marginBottom: 3,
+              marginRight: 3,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+				  >
+            <img src={zackPhoto} alt="Zack Waxler" height={200} width={200} padding={50}/>
+            <Typography>Zack Waxler</Typography>
+            <Typography>tuj00149@temple.edu</Typography>
+            <Typography><Link href="https://github.com/ZackWaxler">GitHub</Link></Typography>
           </Box>
         </Box>
       </Container>
