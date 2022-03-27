@@ -5,7 +5,6 @@ import { Audio }  from 'expo-av';
 
 export default function playButton({parentToChild2}){
     
-        console.log(typeof(parentToChild2))
         return(
             <p>{parentToChild2}</p>
         )
