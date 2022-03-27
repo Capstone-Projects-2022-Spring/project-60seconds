@@ -5,8 +5,27 @@ import { Audio }  from 'expo-av';
 
 export default function playButton({parentToChild2}){
     
-        return(
-            <p>{parentToChild2}</p>
-        )
+    const [sound, setSound] = React.useState();
+
+    async function playSound() {
+      console.log('Loading Sound');
+      const { sound } = await Audio.Sound.createAsync(
+         parentToChild2);
+      setSound(sound);
+  
+      console.log('Playing Sound');
+      await sound.playAsync(); }
+  
+    React.useEffect(() => {
+      return sound
+        ? () => {
+            console.log('Unloading Sound');
+            sound.unloadAsync(); }
+        : undefined;
+    }, [sound]);
+  
+    return (
+        <Button title="Play Sound" onPress={playSound} />
+    );
     
 }
