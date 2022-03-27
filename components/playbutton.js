@@ -24,8 +24,15 @@ export default function playButton({parentToChild2}){
         : undefined;
     }, [sound]);
   
-    return (
-        <Button title="Play Sound" onPress={playSound} />
-    );
+    if(parentToChild2.includes("http")){
+        console.log("true link")
+        return (
+            <Button title="Play Sound" onPress={playSound} />
+        );
+    } else {
+        return(
+            <p>{parentToChild2}</p>
+        )
+    }
     
 }
