@@ -17,5 +17,5 @@ export default StyleSheet.create({
     }, 
     pages: {
       alignItems: 'center',
-    }
+    },
   });

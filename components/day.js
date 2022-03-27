@@ -11,8 +11,8 @@ export default function Day({parentToChild}){
     //console.log(selectedDateString);
     const [data, setData] = useState('');
 
-    const parentToChild2 = (dateToSet) => {
-      setData(dateToSet.toString());
+    const parentToChild2 = (linkToSet) => {
+      setData(linkToSet.toString());
   }
 
     //querying backend for links based on day.
@@ -23,13 +23,12 @@ export default function Day({parentToChild}){
         }
       })
       .then(function (response) {
-        //let link = response.data[0].link;
-        console.log(response.data);
+        //console.log(response.data);
         if(response.data.length == 0){
           parentToChild2('No recordings made this day.');
         } else {
-          parentToChild2(response.data[0].link);
-          //setLinks(response.data[0].link);
+          //for milestone demo 2, it plays the most recent recording returned from the query
+          parentToChild2(response.data[response.data.length - 1].link);
         }
       }) 
       .catch(function (error) {
@@ -40,7 +39,7 @@ export default function Day({parentToChild}){
         <div className="dayBox">
             <View style={styles.dayBox}>
                 <h3>{parentToChild.toDateString()}</h3> 
-                <PlayButton parentToChild2={data.toString()}/>
+                <PlayButton parentToChild2={data}/>
             </View>
         </div>
     )
