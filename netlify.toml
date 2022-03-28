@@ -1,6 +1,0 @@
-[build] 
-command = "expo start --web" 
-publish = "web-build" 
-
-[dev] 
-publish = "src"
