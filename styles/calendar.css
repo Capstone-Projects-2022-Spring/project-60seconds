@@ -42,6 +42,11 @@
   .inactiveDay {
     color: #9e9e9e;
   }
+
+  .dayWithRecording {
+    color: #a1ffb7;
+  }
+  
   .today {
     background: #efefee;
     border-radius: 50%;
