@@ -38,7 +38,7 @@
   "build": {
     "command": "expo start --web",
     "commandOrigin": "ui",
-    "publish": "/opt/build/repo/web-build",
+    "publish": "/opt/build/repo/build",
     "publishOrigin": "ui"
   },
   "private": true
