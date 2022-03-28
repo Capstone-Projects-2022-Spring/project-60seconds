@@ -38,7 +38,7 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function Login() {
+export default function Login(props) {
 	const navigate = useNavigate();
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -55,9 +55,7 @@ export default function Login() {
 			})
 			.then(function (response) {
 				console.log(response);
-				alert(
-					"User: " + data.get("username") + " successfully logged in"
-				);
+				props.changeLoginToTrue();
 				navigate("/Profile", {
 					state: { username: data.get("username") },
 				});

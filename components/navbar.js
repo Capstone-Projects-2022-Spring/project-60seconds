@@ -21,7 +21,7 @@ const appTheme = createTheme({
     },
   });
 
-export default function Navbar() {
+export default function Navbar(props) {
 
     const [anchorElNav, setAnchorElNav] = React.useState(null);
 
@@ -122,9 +122,8 @@ export default function Navbar() {
                                 </Button>
                             </Link>
                         </Box>
-                        <Link to="/login" className="menuLink" style={{color: '#fff', textDecoration: "none"}}>
-                            <Button color="inherit">Login</Button>
-                        </Link>  
+                        {props.isLoggedIn==="false"|| props.isLoggedIn===undefined ? <Link to="/Login"><Button color="inherit">Login</Button></Link>: 
+                        <Link to="/Login"> <Button onClick={()=>{props.changeLoginToFalse()}} color="inherit">Logout</Button></Link>} 
                     </Toolbar>
                 </Container>
             </AppBar>
