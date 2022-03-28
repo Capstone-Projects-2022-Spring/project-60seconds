@@ -42,7 +42,7 @@ export default function Navbar(props) {
                         <AccessTimeIcon sx={{ mr: 1 }}/>
                         <Link to="/" style={{ textDecoration: "none" }}>
                             <Typography variant="h6" noWrap component="div" sx={{mr: 2, display: { xs: 'none', md: 'flex', color: '#fff' }}}>
-                                60 Seconds Capstone
+                                60 Seconds
                             </Typography>
                         </Link>
                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
