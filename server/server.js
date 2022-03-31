@@ -7,8 +7,8 @@
 const mysql = require('mysql2');
 const AWS = require('aws-sdk');
 const fs = require('fs');
-const path = require('path')
-
+const path = require('path');
+const cors = require('cors');
 
 const creds = require('./creds');
 
@@ -28,6 +28,8 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(fileUpload());
+
+app.use(cors());
 
 // Serve static files from /public
 app.use(express.static('public'))
@@ -106,7 +108,8 @@ app.post('/api/upload', (req, res) => {
 
   // Send a 400 error code if no files included
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
+    console.log('No files');
+    return res.status(400).end('No files were uploaded.');
   }
 
   baseURL = 'http://54.226.36.70/audio/';
@@ -153,7 +156,7 @@ app.post('/api/get_links', (req, res) => {
   });
 });
 
-const port = 8080; // TODO: change for production
+const port = 80; // TODO: change for production
 
 app.listen(port, () => {
   console.log(`API server listening on port ${port}`);
