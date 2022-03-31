@@ -169,6 +169,26 @@ app.get('/api/get_links', (req, res) => {
   });
 });
 
+//api call added by Aaron on 3/30/22 to return a the dates that a specific user has made recordings on
+app.get('/api/get_recording_dates', (req, res) => {
+  let username = req.query.username;
+
+  if (username === undefined) {
+    res.status(400).end('Error: no user specified');
+  }
+
+  let statement = `SELECT DISTINCT upload_date FROM audio WHERE creator LIKE '${username}'`;
+  console.log('Running statement ' + statement);
+  connection.query(statement, function (err, result, fields) {
+    // User created, return 200 OK
+    console.log('Query executed');
+    console.log(result);
+
+    res.status(200)
+      .end(JSON.stringify(result));
+  });
+});
+
 const port = conf.port || 80;
 
 app.listen(port, () => {
