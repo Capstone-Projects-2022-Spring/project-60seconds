@@ -1,1 +1,4 @@
-sudo forever start server-better-storage.js
+#!/bin/bash
+
+echo "Starting server with forever..."
+sudo forever start server.js

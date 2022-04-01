@@ -1,2 +1,4 @@
-sudo forever stop server-better-storage.js
+#!/bin/bash
 
+echo "Stopping server with forever..."
+sudo forever stop server.js
