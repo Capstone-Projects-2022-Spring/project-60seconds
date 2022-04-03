@@ -13,6 +13,10 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 
+const http = require('http');
+const https = require('https');
+
+
 const crypto = require('crypto');
 
 // Authentication
@@ -30,13 +34,29 @@ const connection = mysql.createConnection({
   password: creds.dbPassword // password of the mysql connection
 });
 
+
+// SSL Authentication
+
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/chain.pem', 'utf8');
+const credentials = {
+        key: privateKey,
+        cert: certificate,
+        ca: ca
+};
+
+// / SSL Authentication
+
+
 const app = express();
 
 // Enable express-session middleware
 app.use(session({
     secret: creds.sessionSecret,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { sameSite: 'none' }
 }));
 
 app.use(bodyParser.json());
@@ -236,8 +256,24 @@ app.get('/api/get_recording_dates', authenticationCheck, (req, res) => {
 
 const port = conf.port || 80;
 
-app.listen(port, () => {
-  console.log(`API server listening on port ${port}`);
+// Server
+
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.addContext('api.60seconds.io', credentials); // if you have the second domain.
+// httpsServer.addContext('<domain3.com>', credentials3); if you have the thrid domain.
+// httpsServer.addContext('<domain4.com>', credentials4); if you have the fourth domain.
+//..
+httpsServer.listen(443, () => {
+  console.log('HTTPS Server running on port 443');
 });
+
+
+// / Server
+
+//app.listen(port, () => {
+//  console.log(`API server listening on port ${port}`);
+//});
 
 module.exports = app;
