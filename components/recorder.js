@@ -15,6 +15,7 @@ export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
+	let isRecording = false;
 
 	async function startRecording() {
 		try {
@@ -30,6 +31,7 @@ export default function recorder() {
 			);
 			setRecording(recording);
 			console.log('Recording started');
+			isRecording = true;
 			startTranscribe();
 		} catch (err) {
 			console.error('Failed to start recording', err);
@@ -90,7 +92,7 @@ export default function recorder() {
 
 
 		setRecordings(updatedRecordings);
-
+		isRecording = false;
 
 		let user = await axios.get('https://api.60seconds.io/api/user');
 		sendToServer(recording, user.data.username);
@@ -118,22 +120,26 @@ export default function recorder() {
 	}
 
 	function startTranscribe() {
-		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		const recognition = new SpeechRecognition();
-		recognition.interimResults = true;
+		var output = document.getElementById("content");
+		var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+		var recognition = new SpeechRecognition();
+		recognition.onstart = function() {
+			if (isRecording) {
+				console.log('is recording, start speech to text');
+			}
+		};
 
-		recognition.addEventListener('result', e => {
-			const transcript = Array.from(e.results)
-				.map(result => result[0])
-				.map(result => result.transcript)
-				.join('');
-			document.getElementById("header").innerHTML = transcript;
-			console.log(transcript);
-		});
+		recognition.onspeechend = function() {
+			console.log('is not recording, end speech to text');
+			recognition.stop();
+		}
 
-		console.log('Starting Transcription');
+		recognition.onresult = function(event) {
+			var transcript = event.results[0][0].transcript;
+			output.innerHTML = transcript;
+			output.classList.remove("hide");
+		};
 		recognition.start();
-		recognition.addEventListener('end', recognition.start);
 	}
 
 	return (
@@ -184,3 +190,27 @@ const styles = StyleSheet.create({
 		margin: 16,
 	}
 });
+
+
+//
+// var transcript = "";
+//
+// window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// const recognition = new SpeechRecognition();
+// recognition.interimResults = true;
+// const words = document.querySelector('.words');
+// words.appendChild(content);
+//
+// recognition.addEventListener('result', e => {
+// 	const transcript = String.from(e.results);
+// 	// Array.from(e.results)
+// 	// .map(result => result[0])
+// 	// .map(result => result.transcript)
+// 	// .join('');
+// 	document.getElementById("content").innerHTML = transcript;
+// 	console.log(transcript);
+// });
+//
+// console.log('Starting Transcription');
+// recognition.start();
+// recognition.addEventListener('end', recognition.start);
