@@ -63,6 +63,7 @@ export default function recorder() {
 	}
 
 
+
 	async function stopRecording() {
 
 		let updatedRecordings = [...recordings];
@@ -87,13 +88,13 @@ export default function recorder() {
 			console.error("Error generating audio file: " + error);
 		}
 
-		
+
 
 		setRecordings(updatedRecordings);
 
-		// Send to server
-		sendToServer(recording, 'testUsername');
 
+		let user = await axios.get('https://api.60seconds.io/api/user');
+		sendToServer(recording, user.data.username);
 	}
 
 
