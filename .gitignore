@@ -2,6 +2,7 @@ node_modules/
 web_build/
 build/
 dist/
+.expo/
 npm-debug.*
 *.jks
 *.p8
