@@ -1,0 +1,14 @@
+node_modules/
+web_build/
+
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# macOS
+.DS_Store
