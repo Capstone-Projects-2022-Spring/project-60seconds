@@ -1,5 +1,6 @@
 node_modules/
 web_build/
+build/
 .expo
 dist/
 npm-debug.*
