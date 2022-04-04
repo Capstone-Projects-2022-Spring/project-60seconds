@@ -63,7 +63,7 @@ app.use(bodyParser.json());
 app.use(fileUpload());
 
 // If locally hosted, use development setting for request origins
-app.use(cors( { credentials: true, origin: "http://" + (conf.host === "localhost" ? "localhost:19006" : conf.host) } ));
+app.use(cors( { credentials: true, origin: "https://" + (conf.host === "localhost" ? "localhost:19006" : conf.host) } ));
 
 // Serve static files from /public
 app.use(express.static('public'))
