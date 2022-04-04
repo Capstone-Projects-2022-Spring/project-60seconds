@@ -30,6 +30,7 @@ export default function recorder() {
 			);
 			setRecording(recording);
 			console.log('Recording started');
+			startTranscribe();
 		} catch (err) {
 			console.error('Failed to start recording', err);
 		}
@@ -116,28 +117,23 @@ export default function recorder() {
 		});
 	}
 
-	function textToSpeech() {
-		var speech = true;
+	function startTranscribe() {
 		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		const recognition = new SpeechRecognition();
 		recognition.interimResults = true;
-		const words = document.querySelector('.words');
-		words.appendChild(p);
 
 		recognition.addEventListener('result', e => {
 			const transcript = Array.from(e.results)
 				.map(result => result[0])
 				.map(result => result.transcript)
-				.join('')
-
-			document.getElementById("p").innerHTML = transcript;
+				.join('');
+			document.getElementById("header").innerHTML = transcript;
 			console.log(transcript);
 		});
 
-		if (speech == true) {
-			recognition.start();
-			recognition.addEventListener('end', recognition.start);
-		}
+		console.log('Starting Transcription');
+		recognition.start();
+		recognition.addEventListener('end', recognition.start);
 	}
 
 	return (
@@ -158,9 +154,9 @@ export default function recorder() {
 					sx={{ mt: 3, mb: 2 }}
 				/>
 				{getRecordingLines()}
-				<h1>Text To Speech</h1>
-				<div className="words" contenteditable>
-					<p id="p"></p>
+				<h1 id='header'>Text To Speech</h1>
+				<div className="words" contentEditable suppressContentEditableWarning>
+					<p id='content'></p>
 				</div>
 			</Box>
 		</Container>
