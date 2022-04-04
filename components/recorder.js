@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import axios from 'axios';
 import { duration } from '@mui/material';
 
+axios.defaults.withCredentials = true;
 
 export default function recorder() {
 
@@ -57,7 +58,7 @@ export default function recorder() {
 		uploadData.append('username', username);
 		uploadData.append('audio', audioFile);
 
-		let apiUploadPath = 'http://54.226.36.70/api/upload';
+		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
 	}
 

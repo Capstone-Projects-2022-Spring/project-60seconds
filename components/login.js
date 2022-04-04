@@ -15,6 +15,9 @@ import Register from "./register";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+
+axios.defaults.withCredentials = true;
+
 const clientId =
 	"889429585915-hma88iu6bd4tk7qfmtj79b94nf6r9gp5.apps.googleusercontent.com";
 
@@ -49,7 +52,7 @@ export default function Login(props) {
 		});
 
 		axios
-			.post("http://54.226.36.70/api/login", {
+			.post("https://api.60seconds.io/api/login", {
 				username: data.get("username"),
 				password: data.get("password"),
 			})
