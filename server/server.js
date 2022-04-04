@@ -97,7 +97,8 @@ app.post(app.prefix + 'login', async (req, res) => {
     let password = req.body.password;
 
     if (req.session.user !== undefined) {
-      res.status(400).end('Already logged in');
+//      res.status(400).end('Already logged in');
+      req.session.destroy();
     }
 
     let sql = `SELECT * FROM users WHERE username LIKE '${username}' AND password LIKE '${password}'`;
@@ -134,8 +135,9 @@ app.get('/api/logout', (req, res) => {
   res.status(200).end();
 });
 
-app.get(app.prefix + 'authenticated', authenticationCheck,  (req, res) => {
-  res.status(200).end();
+
+app.get(app.prefix + 'user', authenticationCheck,  (req, res) => {
+  res.status(200).end(JSON.stringify({ 'username': req.session.user }));
 });
 
 app.post(app.prefix + 'create_account', (req, res) => {
