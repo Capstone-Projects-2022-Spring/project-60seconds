@@ -56,7 +56,7 @@ app.use(session({
     secret: creds.sessionSecret,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // should be secure for production
+    cookie: { sameSite: 'none', secure: true } // should be secure for production
 }));
 
 app.use(bodyParser.json());
