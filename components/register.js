@@ -10,6 +10,8 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
+
 function Copyright(props) {
 	return (
 		<Typography
@@ -40,7 +42,7 @@ export default function Register() {
 		});
 
 		axios
-			.post("http://54.226.36.70/api/create_account", {
+			.post("https://api.60seconds.io/api/create_account", {
 				username: data.get("username"),
 				password: data.get("password"),
 			})

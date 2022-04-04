@@ -4,6 +4,7 @@ import styles from '../App.style';
 import axios from "axios";
 import PlayButton from './playbutton';
 
+axios.defaults.withCredentials = true;
 
 export default function Day({parentToChild}){
     
@@ -16,7 +17,7 @@ export default function Day({parentToChild}){
   }
 
     //querying backend for links based on day.
-    axios.get('http://54.226.36.70/api/get_links', {
+    axios.get('https://api.60seconds.io/api/get_links', {
         params: {
           username: "testUsername",
           date: selectedDateString
