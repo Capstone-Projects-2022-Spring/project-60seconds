@@ -4,50 +4,24 @@
 // TODO: Needs a lot of refactoring; split logic between multiple files, fix vulnerabilities, clean things up
 // TODO: Fix glaring SQL injection vulnerabilities
 
-const mysql = require('mysql2');
-const AWS = require('aws-sdk');
+// const mysql = require('mysql2');
+const crypto = require('crypto');
 const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-
+const session = require('express-session');
 const http = require('http');
 const https = require('https');
 
-
-const crypto = require('crypto');
-
-// Authentication
-const session = require('express-session');
-
-// JSON Imports
+// Custom Imports
 const creds = require('./creds');
 const conf = require('./conf');
 
-const connection = mysql.createConnection({
-  host: 'sixtyseconds.cvdaqyvuh6xj.us-east-1.rds.amazonaws.com', // host for connection
-  port: 3306, // default port for mysql is 3306
-  database: 'main', // database from which we want to connect out node application
-  user: creds.dbUser, // username of the mysql connection
-  password: creds.dbPassword // password of the mysql connection
-});
-
-
-// SSL Authentication
-
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/api.60seconds.io/chain.pem', 'utf8');
-const credentials = {
-        key: privateKey,
-        cert: certificate,
-        ca: ca
-};
-
-// / SSL Authentication
-
+const db = require('./database');
+const auth = require('./auth')
 
 const app = express();
 
@@ -59,64 +33,51 @@ app.use(session({
     cookie: { sameSite: 'none', secure: true } // should be secure for production
 }));
 
+// Other middleware
 app.use(bodyParser.json());
 app.use(fileUpload());
 
-// If locally hosted, use development setting for request origins
-
+// If client is locally hosted (development), allow local request origins instead of foreign
 let origin = conf.mode === 'development' ? 'https://localhost:19006' : 'https://60seconds.io';
-
 app.use(cors( { credentials: true, origin: origin, } ));
 
 // Serve static files from /public
 app.use(express.static('public'))
 
+/**
+ * API
+ */
 app.prefix = '/api/';
 
-let authenticationCheck = function(req, res, next) {
-  console.log('A client is attempting to access an authenticated endpoint');
-
-  if (req.session.user !== undefined) {
-    console.log('Authenticated, continuing')
-    return next();
-  }
-
-  else {
-    console.log('Not authenticated')
-    return res.status(401).end('Unauthorized');
-  }
-}
-
+/**
+ * GET /
+ */
 app.get(app.prefix, (req, res) => {
   res.send('API server is up!');
 });
 
-// Handle login attempts
+/**
+ * POST /login
+ */
 app.post(app.prefix + 'login', async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
+    // If a user is already logged them in, log them out before processing another login attempt
     if (req.session.user !== undefined) {
-//      res.status(400).end('Already logged in');
+      console.log('[/api/login] A previously logged in user is trying to login again; destroying their session.');
       req.session.destroy();
     }
 
-    let sql = `SELECT * FROM users WHERE username LIKE '${username}' AND password LIKE '${password}'`;
-    connection.query(sql, function (err, result, fields) {
+    db.exec('SELECT * FROM users WHERE username LIKE ? AND password LIKE ?', [ username, password ], db.connection, function(err, result, fields) {
       if (err) throw err;
 
       let parsedResult = JSON.parse(JSON.stringify(result))[0];
 
       // Login information correct
       if (result.length === 1) {
-          console.log('[/api/login] Succesful login: ' + username + ':' + password)
-
-          console.log('Session created')
-
-          // Update user's session status
+          console.log(`[/api/login] Succesful login from ${username}:${password}, creating a new session`);
           req.session.user = req.body.username;
-
-          // Return 200 OK
           res.status(200).end(req.body.username);
       } else {
           console.log('[/api/login] Unsuccesful login attempt: ' + req.body.username + ':' + req.body.password);
@@ -125,55 +86,62 @@ app.post(app.prefix + 'login', async (req, res) => {
     });
 });
 
-// Deauthenticate Caller
-app.get('/api/logout', (req, res) => {
+/**
+ * GET /api/logout
+ */
+app.get(app.prefix + 'logout', (req, res) => {
+  // User not logged in
   if (req.session.user === undefined) {
     res.status(400).end();
   }
 
+  console.log(`[/api/logout] ${req.session.user} logged out.`);
+
+  // End the caller's session
   req.session.destroy();
   res.status(200).end();
 });
 
-
-app.get(app.prefix + 'user', authenticationCheck,  (req, res) => {
+/**
+ * GET /api/user
+ * (authentication required)
+ */
+app.get(app.prefix + 'user', auth.authenticationCheck, (req, res) => {
   res.status(200).end(JSON.stringify({ 'username': req.session.user }));
 });
 
+/**
+ * POST /api/create_account
+ */
 app.post(app.prefix + 'create_account', (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
 
-  let statement = `SELECT * FROM users WHERE username LIKE '${username}'`;
-  connection.query(statement, function (err, result, fields) {
+  db.exec('SELECT * FROM users WHERE username LIKE ?', [ username ], db.connection, function (err, result, fields) {
     if (err) throw err;
 
     let parsedResult = JSON.parse(JSON.stringify(result))[0];
 
-    // Account already exists, return 400 error
-    if (result.length === 1) {
+
+    if (result.length === 1) { // Account already exists, return 400 error
         console.log('[/api/create_account] Error: user already exists ' + username + ':' + password);
 
-
         res.status(400).end(req.body.username);
-
     } else { // Create a new account
         console.log('[/api/create_account] Creating new account ' + username + ':' + password);
 
-        let statement = `INSERT INTO users (username, password) VALUES ('${username}', '${password}')`;
-        console.log('Running statement ' + statement);
-        connection.query(statement, function (err, result, fields) {
-          // User created, return 200 OK
-          console.log('Query executed');
-
+        db.exec('INSERT INTO users (username, password) VALUES (?, ?)', [ username, password ], db.connection, function (err, result, fields) {
           res.status(200).end();
         });
     }
   });
 });
 
-// Authentication required
-app.post('/api/upload', authenticationCheck, (req, res) => {
+/**
+ * POST /api/upload
+ * (authentication required)
+ */
+app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
   let username = req.body.username;
 
   if (username === undefined) {
@@ -186,7 +154,7 @@ app.post('/api/upload', authenticationCheck, (req, res) => {
     return res.status(400).end('Error: No files were uploaded.');
   }
 
-  baseURL = 'https://api.60seconds.io/audio/';
+  baseURL =  `https://${conf.host}/audio/`;
 
   let audioFile = req.files.audio;
 
@@ -205,9 +173,10 @@ app.post('/api/upload', authenticationCheck, (req, res) => {
       "tags": ""
     }
 
-    let statement = `INSERT INTO audio (link, creator, tags) VALUES ('${audioObject.link}', '${audioObject.creator}', '${audioObject.tags}')`;
-    console.log('Running statement ' + statement);
-    connection.query(statement, function (err, result, fields) {
+    db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
+            [ audioObject.link, audioObject.creator, audioObject.tags ],
+            db.connection,
+            function (err, result, fields) {
 
       res.status(200);
       res.end(JSON.stringify(audioObject));
@@ -216,8 +185,11 @@ app.post('/api/upload', authenticationCheck, (req, res) => {
 
 });
 
-// Authentication required
-app.get('/api/get_links', authenticationCheck, (req, res) => {
+/**
+ * GET /api/get_links
+ * (authentication required)
+ */
+app.get(app.prefix + 'get_links', auth.authenticationCheck, (req, res) => {
   let username = req.query.username;
   let date = req.query.date;
 
@@ -229,56 +201,35 @@ app.get('/api/get_links', authenticationCheck, (req, res) => {
     res.status(400).end('Error: no date specified.');
   }
 
-  let statement = `SELECT * FROM audio WHERE creator LIKE '${username}' AND upload_date = '${date}'`;
-  console.log('Running statement ' + statement);
-  connection.query(statement, function (err, result, fields) {
-
-    console.log('Query executed');
-    console.log(result);
-
+  db.exec('SELECT * FROM audio WHERE creator LIKE ? AND upload_date = ?', [ username, date ], db.connection, function (err, result, fields) {
     res.status(200).end(JSON.stringify(result));
   });
 });
 
-//api call added by Aaron on 3/30/22 to return a the dates that a specific user has made recordings on
-// Authentication Required
-app.get('/api/get_recording_dates', authenticationCheck, (req, res) => {
+
+/**
+ * GET /api/get_recording_dates
+ * (authentication required)
+ */
+app.get(app.prefix + 'get_recording_dates', auth.authenticationCheck, (req, res) => {
   let username = req.query.username;
 
   if (username === undefined) {
     res.status(400).end('Error: no user specified');
   }
 
-  let statement = `SELECT DISTINCT upload_date FROM audio WHERE creator LIKE '${username}'`;
-  console.log('Running statement ' + statement);
-  connection.query(statement, function (err, result, fields) {
-    console.log('Query executed');
-    console.log(result);
-
+  db.exec('SELECT DISTINCT upload_date FROM audio WHERE creator LIKE ?', [ username ], db.connection, function (err, result, fields) {
     res.status(200).end(JSON.stringify(result));
   });
 });
 
-const port = conf.port || 80;
-
 // Server
-
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
+const httpsServer = https.createServer(auth.credentials, app);
 
-httpsServer.addContext('api.60seconds.io', credentials); // if you have the second domain.
-// httpsServer.addContext('<domain3.com>', credentials3); if you have the thrid domain.
-// httpsServer.addContext('<domain4.com>', credentials4); if you have the fourth domain.
-//..
+httpsServer.addContext('api.60seconds.io', auth.credentials);
 httpsServer.listen(443, () => {
   console.log('HTTPS Server running on port 443');
 });
-
-
-// / Server
-
-//app.listen(port, () => {
-//  console.log(`API server listening on port ${port}`);
-//});
 
 module.exports = app;
