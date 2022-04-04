@@ -1,7 +1,8 @@
 {
   "port": 80,
-  "host": "localhost",
+  "host": "60seconds.io",
   "dbHost": "sixtyseconds.cvdaqyvuh6xj.us-east-1.rds.amazonaws.com",
   "dbName": "main",
-  "version": "0.0"
+  "version": "0.0",
+  "mode": "development"
 }

@@ -56,14 +56,17 @@ app.use(session({
     secret: creds.sessionSecret,
     resave: false,
     saveUninitialized: true,
-    cookie: { sameSite: 'none' }
+    cookie: { secure: true } // should be secure for production
 }));
 
 app.use(bodyParser.json());
 app.use(fileUpload());
 
 // If locally hosted, use development setting for request origins
-app.use(cors( { credentials: true, origin: "https://" + (conf.host === "localhost" ? "localhost:19006" : conf.host) } ));
+
+let origin = conf.mode === 'development' ? 'https://localhost:19006' : 'https://60seconds.io';
+
+app.use(cors( { credentials: true, origin: origin, } ));
 
 // Serve static files from /public
 app.use(express.static('public'))
@@ -181,7 +184,7 @@ app.post('/api/upload', authenticationCheck, (req, res) => {
     return res.status(400).end('Error: No files were uploaded.');
   }
 
-  baseURL = 'http://54.226.36.70/audio/';
+  baseURL = 'https://api.60seconds.io/audio/';
 
   let audioFile = req.files.audio;
 
