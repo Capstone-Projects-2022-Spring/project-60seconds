@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import Box from '@mui/material/Box'
 import Day from '../components/day';
 
-export default function calendar(props) {
+export default function calendar({dateArray}) {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeDate, setActiveDate] = useState(new Date())
@@ -18,7 +18,7 @@ export default function calendar(props) {
 
     const dates = [];
 
-    Object.entries(props.dateArray).forEach(entry => {
+    Object.entries(dateArray).forEach(entry => {
         const [key, value] = entry;
         
         //there is a strange error where days from database that are converted to JS date objects are one day behind.
