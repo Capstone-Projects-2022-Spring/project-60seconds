@@ -11,7 +11,6 @@ export default function Calendar() {
 
     axios.get('https://api.60seconds.io/api/user').then(function(response) {
       username = response.data.username;
-    
 
     //api call to get dates of recordings made by a user
     axios.get('https://api.60seconds.io/api/get_recording_dates', {
