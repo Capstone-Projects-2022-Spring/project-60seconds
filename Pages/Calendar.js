@@ -6,12 +6,17 @@ import CalendarComponent from '../components/CalendarComponent';
 
 export default function Calendar() {
 
+    let username;
     const dates = [];
+
+    axios.get('https://api.60seconds.io/api/user').then(function(response) {
+      username = response.data.username;
+    
 
     //api call to get dates of recordings made by a user
     axios.get('https://api.60seconds.io/api/get_recording_dates', {
         params: {
-          username: "testUsername",
+          username: username,
         }
       })
       .then(function (response) {
@@ -28,7 +33,7 @@ export default function Calendar() {
       .catch(function (error) {
         console.log(error);
       });
-    
+    });
   return (
     <View style={styles.pages}>
       <div className="App">

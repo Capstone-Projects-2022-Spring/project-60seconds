@@ -26,7 +26,6 @@ export default function Day({parentToChild}) {
             date: selectedDateString
           }
         }).then(function (response) {
-          //console.log(response.data);
           if(response.data.length == 0){
             parentToChild2('No recordings made this day.');
           } else {
