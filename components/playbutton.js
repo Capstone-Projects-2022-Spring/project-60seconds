@@ -13,7 +13,8 @@ export default function playButton({parentToChild2}){
       setSound(sound);
   
       //console.log('Playing Sound');
-      await sound.playAsync(); }
+      await sound.playAsync(); 
+    }
   
     React.useEffect(() => {
       return sound

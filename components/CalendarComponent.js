@@ -6,7 +6,7 @@ import Container from "@mui/material/Container";
 import Box from '@mui/material/Box'
 import Day from '../components/day';
 
-export default function calendar() {
+export default function calendar({datesReturned}) {
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeDate, setActiveDate] = useState(new Date())
@@ -16,6 +16,20 @@ export default function calendar() {
         setData(dateToSet);
     }
 
+    const dates = [];
+
+    Object.entries(datesReturned).forEach(entry => {
+        const [key, value] = entry;
+        
+        //there is a strange error where days from database that are converted to JS date objects are one day behind.
+        //this is a temporary fix that adds a day to the returned dates to keep things accurate. [AS 4/2/22]
+        var date = new Date(value);
+        date.setDate(date.getDate() + 1);
+
+        dates.push(date);
+      })
+
+      //console.log(dates);
     const getHeader = () => {
         return (
             <div className="header">
@@ -53,15 +67,26 @@ export default function calendar() {
         return <div className="weekContainer">{weekDays}</div>
     };
 
+    //returns true if currentDate is found in array of dates returned from database
+    const isDateInDatabase = (currentDate) => {
+        for(const date of dates){
+            if(isSameDay(date, currentDate)){
+                return true;
+            }
+        }
+    }
+
     const generateDatesForCurrentWeek = (date, selectedDate, activeDate) => {
         let currentDate = date;
         const week = [];
         for(let day = 0; day < 7; day++){
             const cloneDate = currentDate;
+
             week.push(
                 <div key={currentDate}
                     className={`day 
                         ${isSameMonth(currentDate, activeDate) ? "" : "inactiveDay"} 
+                        ${isDateInDatabase(currentDate) ? "dayWithRecording" : ""}
                         ${isSameDay(currentDate, selectedDate) ? "selectedDay" : ""}
                         ${isSameDay(currentDate, new Date()) ? "today" : ""}}`}
                     onClick={() => {

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { View } from 'react-native';
 import styles from '../App.style';
 import axios from "axios";
@@ -26,7 +26,6 @@ export default function Day({parentToChild}) {
             date: selectedDateString
           }
         }).then(function (response) {
-          //console.log(response.data);
           if(response.data.length == 0){
             parentToChild2('No recordings made this day.');
           } else {
