@@ -44,7 +44,7 @@ export default function Calendar() {
       });
 
       const datesToChild = (datestopass) => {
-        console.log(1);
+        //console.log(1);
         setDates(datestopass);
       }
     }, []);
