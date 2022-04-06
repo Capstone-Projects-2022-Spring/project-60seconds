@@ -16,4 +16,5 @@ export default function logout(props){
   return(
       <p>User successfully logged out!</p>
   )
+  
 }
