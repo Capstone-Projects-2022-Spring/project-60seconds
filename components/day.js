@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import styles from '../App.style';
 import axios from "axios";
 import PlayButton from './playbutton';
+import DownloadButton from './downloadButton';
 
 axios.defaults.withCredentials = true;
 
@@ -45,6 +46,7 @@ export default function Day({parentToChild}) {
             <View style={styles.dayBox}>
                 <h3>{parentToChild.toDateString()}</h3>
                 <PlayButton parentToChild2={data}/>
+                <DownloadButton parentToChild2={data} date={parentToChild}/>
             </View>
         </div>
     )
