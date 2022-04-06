@@ -25,7 +25,7 @@ export default function Profile() {
 					<p className="about-me-input">This is a test of the Profile Page,
 							making sure that everything looks nice and pretty</p>
 				</div>
-				<p><button>View Recordings</button></p>
+				<p><button className="profile-page-button">View Recordings</button></p>
 			</div>
         </>
     )
