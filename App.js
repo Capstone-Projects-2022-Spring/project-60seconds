@@ -13,24 +13,20 @@ import React from 'react';
 
 export default function App() {
   
-  const [isLoggedIn, setIsLoggedIn] = React.useState("false");
-  const changeLoginToTrue = () => {
-    setIsLoggedIn('true');
-  }
-
-  const changeLoginToFalse  = () => {
-    setIsLoggedIn('false');
+  const [loginState, setLoginState] = React.useState(null);
+  const getLoginState = (value) =>{
+    setLoginState(value);
   }
 
   return (
     <Router>
-      <Navbar isLoggedIn={isLoggedIn} changeLoginToFalse={changeLoginToFalse}/>
+      <Navbar loginState={loginState}/>
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/About" element={<About/>}/>
-        <Route path="/Login" element={<Login changeLoginToTrue={changeLoginToTrue} changeLoginToFalse={changeLoginToFalse}/>}/>
+        <Route path="/Login" element={<Login getLoginState={getLoginState} />}/>
         <Route path="/Register" element={<Register/>}/>
-        <Route path="/Logout" element={<Logout/>}/>
+        <Route path="/Logout" element={<Logout getLoginState={getLoginState}/>}/>
         <Route path="/Calendar" element={<Calendar/>}/>
         <Route path="/Record" element={<Record/>}/>
         <Route path="/Profile" element={<Profile/>}/>

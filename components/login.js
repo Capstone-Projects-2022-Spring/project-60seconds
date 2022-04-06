@@ -58,10 +58,11 @@ export default function Login(props) {
 			})
 			.then(function (response) {
 				console.log(response);
-				props.changeLoginToTrue();
+				localStorage.setItem('username', data.get('username'))
 				navigate("/Profile", {
 					state: { username: data.get("username") },
 				});
+				props.getLoginState(localStorage.getItem('username'));
 			})
 			.catch(function (error) {
 				console.log(error);

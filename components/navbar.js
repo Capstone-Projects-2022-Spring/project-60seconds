@@ -122,8 +122,10 @@ export default function Navbar(props) {
                                 </Button>
                             </Link>
                         </Box>
-                        {props.isLoggedIn==="false"|| props.isLoggedIn===undefined ? <Link to="/Login" className="menuLink" style={{color: '#fff', textDecoration: "none"}}><Button color="inherit">Login</Button></Link>: 
-                        <Link to="/Logout" className="menuLink" style={{color: '#fff', textDecoration: "none"}}> <Button onClick={()=>{props.changeLoginToFalse()}} color="inherit">Logout</Button></Link>} 
+                        {localStorage.getItem("username") ? 
+                        <Link to="/Logout" className="menuLink" style={{color: '#fff', textDecoration: "none"}}> <Button color="inherit">Logout</Button></Link> :  
+                        <Link to="/Login" className="menuLink" style={{color: '#fff', textDecoration: "none"}}><Button color="inherit">Login</Button></Link>} 
+
                     </Toolbar>
                 </Container>
             </AppBar>
