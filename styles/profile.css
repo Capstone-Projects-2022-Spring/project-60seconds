@@ -28,7 +28,7 @@
     font-size: 30px;
 }
 
-button {
+.profile-page-button {
     border: none;
     outline: 0;
     display: inline-block;

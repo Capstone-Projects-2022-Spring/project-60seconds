@@ -1,24 +1,18 @@
 import * as React from "react";
 import ProfilePic from '../assets/zach.jpg'
-import { useLocation } from "react-router-dom";
 import "../styles/profile.css";
 
 export default function Profile() {
 
-    const location = useLocation();
-	const [username, setUsername] = React.useState("not login");
-	const [name, setName] = React.useState("not login")
+    const [userName, setUserName] = React.useState('');
+	
+
 	React.useEffect(() => {
-		if (location.state) {
-			setUsername(location.state.username);
+		if(localStorage.getItem('username')) {
+			setUserName(localStorage.getItem('username'))
 		}
 	}, []);
 
-	React.useEffect(() => {
-		if (location.state) {
-			setName(location.state.name);
-		}
-	}, []);
 
 
 
@@ -26,12 +20,12 @@ export default function Profile() {
         <>
 			<div className="profile-card">
 				<img src={ProfilePic} className="profile-picture"/>
-				<h1 className="username">{username}</h1>
+				<h1 className="username">{userName}</h1>
 				<div className="about-me-card">
 					<p className="about-me-input">This is a test of the Profile Page,
 							making sure that everything looks nice and pretty</p>
 				</div>
-				<p><button>View Recordings</button></p>
+				<p><button className="profile-page-button">View Recordings</button></p>
 			</div>
         </>
     )

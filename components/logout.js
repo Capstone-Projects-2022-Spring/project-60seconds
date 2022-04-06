@@ -3,10 +3,15 @@ import axios from "axios";
 
 axios.defaults.withCredentials = true;
 
-export default function logout(){
+export default function logout(props){
+
 
 
   axios.get('https://api.60seconds.io/api/logout');
+
+  localStorage.clear();
+
+  props.getLoginState(localStorage.getItem('username'));
 
   return(
       <p>User successfully logged out!</p>
