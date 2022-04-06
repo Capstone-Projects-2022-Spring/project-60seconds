@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import {BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
+
 const appTheme = createTheme({
     palette: {
       primary: {
@@ -22,12 +23,13 @@ const appTheme = createTheme({
   });
 
 export default function Navbar(props) {
-
+    
     const [anchorElNav, setAnchorElNav] = React.useState(null);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
+
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
@@ -101,29 +103,28 @@ export default function Navbar(props) {
                         </Box>
 
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }}}>
-                            <Link to="/calendar" style={{ textDecoration: "none" }}>
-                                <Button key="Calendar" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                            
+                                <Button key="Calendar" disabled={localStorage.getItem("username")===null} component={Link} to="/calendar" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Calendar
                                 </Button>
-                            </Link>
-                            <Link to="/record" style={{ textDecoration: "none" }}>
-                                <Button key="Record" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                            
+
+                                <Button key="Record" disabled={localStorage.getItem("username")===null} component={Link} to="/record" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Record
                                 </Button>
-                            </Link>
-                            <Link to="/about" style={{ textDecoration: "none" }}>
-                                <Button key="About" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
-                                    About
-                                </Button>
-                            </Link>
-                            <Link to="/Profile" style={{ textDecoration: "none" }}>
-                                <Button key="Profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+
+
+                                <Button key="Profile" disabled={localStorage.getItem("username")===null} component={Link} to="/profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     Profile
                                 </Button>
-                            </Link>
+
+                                <Button key="About" component={Link} to="/profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                    About
+                                </Button>
+
                         </Box>
                         {localStorage.getItem("username") ? 
-                        <Link to="/Logout" className="menuLink" style={{color: '#fff', textDecoration: "none"}}> <Button color="inherit">Logout</Button></Link> :  
+                        <Link to="/Logout" className="menuLink" style={{color: '#fff', textDecoration: "none"}}> <Button color="inherit">{localStorage.getItem("username")} - Logout</Button></Link> :  
                         <Link to="/Login" className="menuLink" style={{color: '#fff', textDecoration: "none"}}><Button color="inherit">Login</Button></Link>} 
 
                     </Toolbar>
