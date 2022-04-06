@@ -8,12 +8,13 @@ import CalendarComponent from '../components/CalendarComponent';
 export default function Calendar() {
 
 
-    let datearray = [];
+    let datesReturned = [];
     const [dates, setDates] = useState([]);
 
+    //enclosing the get requests in the useEffect() statement ensures the API calls only run 
+    //once and only update the corresponding components when the result of the calls changes.
     useEffect(() => {
       let username;
-      //const dates = [];
 
       axios.get('https://api.60seconds.io/api/user').then(function(response) {
         username = response.data.username;
@@ -31,10 +32,10 @@ export default function Calendar() {
             //parse through api response and add values to dates array
             Object.entries(response.data).forEach(entry => {
               const [key, value] = entry;
-              datearray.push(value.upload_date);
+              datesReturned.push(value.upload_date);
             })
 
-            datesToChild(datearray);
+            datesToChild(datesReturned);
           }
         }) 
         .catch(function (error) {
@@ -52,7 +53,7 @@ export default function Calendar() {
   return (
     <View style={styles.pages}>
       <div className="App">
-        <CalendarComponent dateArray={dates}/>
+        <CalendarComponent datesReturned={dates}/>
         <StatusBar style="auto" />
       </div>
     </View>
