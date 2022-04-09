@@ -16,6 +16,8 @@ export default function recorder() {
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
 	let isRecording = false;
+	let helper = 0;
+
 
 	async function startRecording() {
 		try {
@@ -39,6 +41,7 @@ export default function recorder() {
 	}
 
 	async function sendToServer(recording, username) {
+		console.log("Sending to server...");
 		const fileName = '60seconds-audio.mp3'
 
 		// SO snippet
@@ -102,7 +105,22 @@ export default function recorder() {
 		isRecording = false;
 
 		let user = await axios.get('https://api.60seconds.io/api/user');
-		sendToServer(recording, user.data.username);
+		const username = user.data.username;
+
+		if (helper > 0)
+			sendToServerHelper(recording, username);
+		else
+			console.log("submit not pressed");
+
+	}
+
+	function sendToServerHelper(recording, username) {
+		console.log("in helper with value: " + helper);
+		sendToServer(recording, username);
+	}
+
+	function increaseCounter() {
+		helper++;
 	}
 
 	function getDurationFormatted(millis) {
@@ -167,6 +185,12 @@ export default function recorder() {
 					sx={{ mt: 3, mb: 2 }}
 				/>
 				{getRecordingLines()}
+				<Button
+					title={'Submit'}
+					onPress={increaseCounter}
+					fullWidth
+					sx={{ mt: 3, mb: 2 }}
+				/>
 				<h1 id='header'>Text To Speech</h1>
 				<div className="words" contentEditable suppressContentEditableWarning>
 					<p id='content'></p>
@@ -195,6 +219,7 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		margin: 16,
+		marginTop: 16,
 	}
 });
 
