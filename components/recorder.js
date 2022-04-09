@@ -77,13 +77,21 @@ export default function recorder() {
 		recording.getStatusAsync()
 			.then(function (result) {
 				console.log("The duration is: " + result.durationMillis)
-				updatedRecordings.push({
-					sound: sound,
-					duration: getDurationFormatted(result.durationMillis),
-					file: recording.getURI()
-				});
+
+				if (result.durationMillis > 60000) {
+					alert("Recordings must be less than 60 seconds in duration");
+				} else {
+					updatedRecordings.pop();
+					updatedRecordings.push({
+						sound: sound,
+						duration: getDurationFormatted(result.durationMillis),
+						file: recording.getURI()
+					});
+					setRecordings(updatedRecordings);
+				}
 			})
 			.catch(failureCallback);
+
 
 		function failureCallback(error) {
 			console.error("Error generating audio file: " + error);
@@ -91,7 +99,6 @@ export default function recorder() {
 
 
 
-		setRecordings(updatedRecordings);
 		isRecording = false;
 
 		let user = await axios.get('https://api.60seconds.io/api/user');
@@ -112,7 +119,7 @@ export default function recorder() {
 		return recordings.map((recordingLine, index) => {
 			return (
 				<View key={index} style={StyleSheet.row}>
-					<Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
+					<Text style={styles.fill}>Recording - {recordingLine.duration}</Text>
 					<Button style={styles.button} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
 				</View>
 			);
@@ -123,18 +130,18 @@ export default function recorder() {
 		var output = document.getElementById("content");
 		var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 		var recognition = new SpeechRecognition();
-		recognition.onstart = function() {
+		recognition.onstart = function () {
 			if (isRecording) {
 				console.log('is recording, start speech to text');
 			}
 		};
 
-		recognition.onspeechend = function() {
+		recognition.onspeechend = function () {
 			console.log('is not recording, end speech to text');
 			recognition.stop();
 		}
 
-		recognition.onresult = function(event) {
+		recognition.onresult = function (event) {
 			var transcript = event.results[0][0].transcript;
 			output.innerHTML = transcript;
 			output.classList.remove("hide");
@@ -179,8 +186,8 @@ const styles = StyleSheet.create({
 	},
 	row: {
 		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
 	},
 	fill: {
 		flex: 1,
