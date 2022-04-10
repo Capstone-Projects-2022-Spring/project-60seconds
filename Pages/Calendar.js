@@ -7,7 +7,15 @@ import CalendarComponent from '../components/CalendarComponent';
 
 export default function Calendar() {
 
+    //created event class to specify specific object
+    class Event{
+      constructor(date, description){
+        this.eventDate = date;
+        this.eventDescription = description;
+      }
+    }
 
+    let events = [];
     let datesReturned = [];
     const [dates, setDates] = useState([]);
 
@@ -18,6 +26,27 @@ export default function Calendar() {
 
       axios.get('https://api.60seconds.io/api/user').then(function(response) {
         username = response.data.username;
+
+      axios.get('https://api.60seconds.io/api/get_events', {
+        params: {
+          username: username,
+        }
+      }).then(function (response) {  
+        if(response.data.length == 0){
+          console.log("no events returned")
+        } else {
+          Object.entries(response.data).forEach(entry => {
+            const [key, value] = entry;
+            let eventDate = new Date(value.time);
+            eventDate.setHours(eventDate.getHours() + 4)
+            const event = new Event(eventDate, value.description);
+            events.push(event);
+          })
+          console.log(events);
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
 
       //api call to get dates of recordings made by a user
       axios.get('https://api.60seconds.io/api/get_recording_dates', {
