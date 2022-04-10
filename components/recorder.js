@@ -11,7 +11,7 @@ import { duration } from '@mui/material';
 
 axios.defaults.withCredentials = true;
 
-let globalTranscript = '';
+let globalTranscript;
 
 export default function recorder() {
 
@@ -61,8 +61,6 @@ export default function recorder() {
 		uploadData.append('username', username);
 		uploadData.append('transcript', globalTranscript);
 		uploadData.append('audio', audioFile);
-
-		globalTranscript = '';
 
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
@@ -150,20 +148,16 @@ export default function recorder() {
 				.map(result => result.transcript)
 				.join('');
 
+			document.getElementById('content').innerHTML = transcript;
 			console.log(`Result found: ${transcript}`);
 			transcriptFinal = transcriptFinal + transcript;
-			globalTranscript += transcriptFinal;
-
-			document.getElementById('content').innerHTML = globalTranscript;
-
+			globalTranscript = transcriptFinal;
 		});
 
 		if (speech === true) {
 			recognition.start();
+			// recognition.addEventListener('end', recognition.start);
 			recognition.addEventListener('end', function(e) {
-				document.getElementById('content').innerHTML = globalTranscript;
-
-				globalTranscript += ' . ';
 				console.log(`GLOBAL TRANSCRIPT: ${globalTranscript}`);
 			});
 
@@ -231,13 +225,13 @@ const styles = StyleSheet.create({
 // words.appendChild(content);
 //
 // recognition.addEventListener('result', e => {
-// 	const transcript = String.from(e.results);
-// 	// Array.from(e.results)
-// 	// .map(result => result[0])
-// 	// .map(result => result.transcript)
-// 	// .join('');
-// 	document.getElementById("content").innerHTML = transcript;
-// 	console.log(transcript);
+//  const transcript = String.from(e.results);
+//  // Array.from(e.results)
+//  // .map(result => result[0])
+//  // .map(result => result.transcript)
+//  // .join('');
+//  document.getElementById("content").innerHTML = transcript;
+//  console.log(transcript);
 // });
 //
 // console.log('Starting Transcription');
