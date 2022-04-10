@@ -11,6 +11,8 @@ import { duration } from '@mui/material';
 
 axios.defaults.withCredentials = true;
 
+let globalTranscript;
+
 export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
@@ -57,7 +59,9 @@ export default function recorder() {
 
 		let uploadData = new FormData();
 		uploadData.append('username', username);
+		uploadData.append('transcript', globalTranscript);
 		uploadData.append('audio', audioFile);
+
 
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
@@ -75,13 +79,21 @@ export default function recorder() {
 		recording.getStatusAsync()
 			.then(function (result) {
 				console.log("The duration is: " + result.durationMillis)
-				updatedRecordings.push({
-					sound: sound,
-					duration: getDurationFormatted(result.durationMillis),
-					file: recording.getURI()
-				});
+
+				if (result.durationMillis > 60000) {
+					alert("Recordings must be less than 60 seconds in duration");
+				} else {
+					updatedRecordings.pop();
+					updatedRecordings.push({
+						sound: sound,
+						duration: getDurationFormatted(result.durationMillis),
+						file: recording.getURI()
+					});
+					setRecordings(updatedRecordings);
+				}
 			})
 			.catch(failureCallback);
+
 
 		function failureCallback(error) {
 			console.error("Error generating audio file: " + error);
@@ -90,9 +102,15 @@ export default function recorder() {
 
 
 		setRecordings(updatedRecordings);
-
 		let user = await axios.get('https://api.60seconds.io/api/user');
-		sendToServer(recording, user.data.username);
+
+		console.log(`Waiting 2s then sending the recording to the server`);
+		setTimeout(function() {
+			console.log(`globalTranscript before sent: ${globalTranscript}`);
+			sendToServer(recording, user.data.username);
+
+		}, 2000);
+		// sendToServer(recording, user.data.username);
 	}
 
 	function getDurationFormatted(millis) {
@@ -109,7 +127,7 @@ export default function recorder() {
 		return recordings.map((recordingLine, index) => {
 			return (
 				<View key={index} style={StyleSheet.row}>
-					<Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
+					<Text style={styles.fill}>Recording - {recordingLine.duration}</Text>
 					<Button style={styles.button} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
 				</View>
 			);
@@ -121,7 +139,7 @@ export default function recorder() {
 		var transcriptFinal = '';
 		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		const recognition = new SpeechRecognition();
-		recognition.interimResults = true;
+		recognition.interimResults = false;
 		const words = document.querySelector('.words');
 		words.appendChild(content);
 
@@ -132,15 +150,21 @@ export default function recorder() {
 				.join('');
 
 			document.getElementById('content').innerHTML = transcript;
-			console.log(transcript);
+			console.log(`Result found: ${transcript}`);
 			transcriptFinal = transcriptFinal + transcript;
+			globalTranscript = transcriptFinal;
 		});
 
 		if (speech === true) {
 			recognition.start();
-			recognition.addEventListener('end', recognition.start);
+			// recognition.addEventListener('end', recognition.start);
+			recognition.addEventListener('end', function(e) {
+				console.log(`GLOBAL TRANSCRIPT: ${globalTranscript}`);
+
+			});
+
 		}
-		console.log(transcriptFinal);
+		// console.log(transcriptFinal);
 	}
 
 	return (
@@ -180,8 +204,8 @@ const styles = StyleSheet.create({
 	},
 	row: {
 		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
 	},
 	fill: {
 		flex: 1,
@@ -203,13 +227,13 @@ const styles = StyleSheet.create({
 // words.appendChild(content);
 //
 // recognition.addEventListener('result', e => {
-// 	const transcript = String.from(e.results);
-// 	// Array.from(e.results)
-// 	// .map(result => result[0])
-// 	// .map(result => result.transcript)
-// 	// .join('');
-// 	document.getElementById("content").innerHTML = transcript;
-// 	console.log(transcript);
+//  const transcript = String.from(e.results);
+//  // Array.from(e.results)
+//  // .map(result => result[0])
+//  // .map(result => result.transcript)
+//  // .join('');
+//  document.getElementById("content").innerHTML = transcript;
+//  console.log(transcript);
 // });
 //
 // console.log('Starting Transcription');
