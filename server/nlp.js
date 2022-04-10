@@ -1,6 +1,4 @@
-/*
-NLP Logic for smart processing of audio transcriptions.
-*/
+#!/usr/bin/env node
 
 const natural = require('natural');
 const chrono = require('chrono-node');
@@ -9,14 +7,22 @@ class Event {
   /**
    * @property {number} time - The time of the event (in epoch)
    * @property {string} description - A simple description of the event (e.g. "Appointment")
+   * @property {string} user - Creator of the audio clip
    */
-  constructor(time, description) {
-    this.time = time;
-    this.description = description;
+  constructor(obj) {
+    if (typeof obj.time === undefined || typeof obj.description === undefined || typeof obj.user === undefined) {
+      throw 'time, description, and user of events must be specified.';
+    }
+
+    this.time = obj.time;
+    this.description = obj.description;
+    this.user = obj.user;
+
+    // this.date = obj.date.toString();  // Debugging
   }
 }
 
-let testTranscript = `I have a doctor's appointment for tomorrow at 8 p.m. Then I have a dentist appointment next Wednesday at 7:30 a.m. I also have a wedding this Monday.`;
+
 
 /**
  * @function extractAppointmentSubtype - Extract the appointment subtype from an appointment (if applicable). Helper function for extractAppointmentEvents()
@@ -24,6 +30,8 @@ let testTranscript = `I have a doctor's appointment for tomorrow at 8 p.m. Then 
  * @returns {string} - Returns the prefix (e.g. "Doctor's " or "Dentist's ") or undefined if an applicable subtype is not found
  */
 function extractAppointmentSubtype(sentence) {
+  let prefix;
+
   // Appointment subtypes
   // [ [stem(s), prefix] ]
   const subtypes = [
@@ -35,7 +43,7 @@ function extractAppointmentSubtype(sentence) {
   ]
 
   // Split sentence into words; accounts for words like "Doctor's" that the built in natural tokenizer does not
-  const words = sentence.replace('\'', '').split(' ');
+  const words = sentence.replace('\'', '').trim().split(' ');
   const appointmentWordIndex = words.indexOf('appointment');
 
   // "Appointment" is the first word in the sentence, meaning there is likely no subtype to extract
@@ -58,16 +66,18 @@ function extractAppointmentSubtype(sentence) {
     console.log(`[extractAppointmentSubtype] Subtype not found for sentence: ${sentence}`);
   }
 
-  // Subtype not found
   return prefix;
 }
+
+
 
 /**
  * @function extractAppointmentEvents - Extract appointment events from the transcript. Helper function for extractEvents()
  * @param {string[]} sentences - Array of sentences in the transcript
+ * @param {string} user - Creator of the audio clip
  * @returns {Event[]} - Returns an array of Event objects
  */
-function extractAppointmentEvents(sentences) {
+function extractAppointmentEvents(sentences, user) {
   let appointmentEvents = [];
 
   sentences.forEach(function(sentence, index) {
@@ -92,19 +102,26 @@ function extractAppointmentEvents(sentences) {
     console.log(`[extractAppointmentEvents] Found a timestamp: ${date}`);
     const description = (subtype === undefined ? '' : subtype) + 'Appointment';
 
-    appointmentEvents.push(new Event(date.getTime(), description));
+    appointmentEvents.push(new Event({
+      time: date.getTime(),
+      description: description,
+      user: user,
+      date: date // Debugging
+    }));
   });
 
   return appointmentEvents;
 }
 
 
+
 /**
  * @function extractOtherEvents - Extract other events from the transcript. Helper function for extractEvents()
  * @param {string[]} sentences - Array of sentences in the transcript
+ * @param {string} user - Creator of the audio clip
  * @returns {Event[]} - Returns an array of Event objects
  */
-function extractOtherEvents(sentences) {
+function extractOtherEvents(sentences, user) {
   let otherEvents = [];
 
   // Types of events. If one is found in a given sentence, events with higher indices will NOT be checked for.
@@ -115,8 +132,8 @@ function extractOtherEvents(sentences) {
     ['concert', 'Concert']
   ]
 
-  sentences.forEach(function(sentence, index) {
-    console.log(`[extractOtherEvents] Parsing sentence ${sentence}`);
+  sentences.forEach(function(sentence) {
+    console.log(`[extractOtherEvents] Parsing sentence: ${sentence}`);
 
     const date = chrono.parseDate(sentence);
 
@@ -125,9 +142,16 @@ function extractOtherEvents(sentences) {
       return;
     }
 
+
     eventTypes.forEach(function(type, index) {
-      if (sentence.toLowerCase().includes(type[0])) {
-        otherEvents.push(new Event(date.getTime(), type[1]));
+      if (sentence.toString().toLowerCase().includes(type[0])) {
+        console.log(`[extractOtherEvents] Extracting event ${type[0]}`);
+        otherEvents.push(new Event({
+          time: date.getTime(),
+          description: type[1],
+          user: user,
+          date: date // Debugging
+        }));
       }
     });
   });
@@ -141,27 +165,32 @@ function extractOtherEvents(sentences) {
 /**
  * @function extractEvents - Extract events from the transcript
  * @param {string} transcriptLink - Link to the transcript
+ * @param {string} user - Creator of the audio clip
  * @returns {Event[]} - Returns an array of Event objects
  */
-function extractEvents() {
+function extractEvents(transcript, user) {
   let events = [];
 
-  let transcript = testTranscript;
+  console.log(transcript);
 
-  // Properly parse sentences with a.m. and p.m. (the format used during transcription)
-  console.log(`${transcript}`);
+  transcript += '. this is a padding sentence.';
 
+  // sentences = transcript.split('then');
 
   const st = new natural.SentenceTokenizer();
+  let sentences = st.tokenize(transcript);
 
-  const sentences = st.tokenize(transcript);
+  console.log(`[extractEvents] Sentences: ${sentences}`);
 
-  events.push.apply(events, extractAppointmentEvents(sentences));
-  events.push.apply(events, extractOtherEvents(sentences));
+  events.push.apply(events, extractAppointmentEvents(sentences, user)); // sentences instead of clauses
+  events.push.apply(events, extractOtherEvents(sentences, user)); // sentences instead of clauses
 
   return events;
 }
 
-console.log(extractEvents());
-
 module.exports.extractEvents = extractEvents;
+
+// Good working transcript
+// let testTranscript = `Man I've got a busy week coming up. I have a doctor's appointment tomorrow at 8 p.m. Then I have a dentist appointment next Wednesday at 7:30 a.m. Then of course I have that big meeting on Thursday. I sure have my work cut out for me. At least I've got that party to look forward to on Saturday.`;
+
+// console.log(extractEvents(testTranscript, 'testUser'));

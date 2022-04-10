@@ -23,6 +23,11 @@ const conf = require('./conf');
 const db = require('./database');
 const auth = require('./auth')
 
+// New for NLP handling
+const nlp = require('./nlp');
+
+
+
 const app = express();
 
 // Enable express-session middleware
@@ -52,7 +57,7 @@ app.prefix = '/api/';
 /**
  * GET /
  */
-app.get(app.prefix, (req, res) => {
+app.get('/api', (req, res) => {
   res.send('API server is up!');
 });
 
@@ -122,7 +127,6 @@ app.post(app.prefix + 'create_account', (req, res) => {
 
     let parsedResult = JSON.parse(JSON.stringify(result))[0];
 
-
     if (result.length === 1) { // Account already exists, return 400 error
         console.log('[/api/create_account] Error: user already exists ' + username + ':' + password);
 
@@ -143,6 +147,7 @@ app.post(app.prefix + 'create_account', (req, res) => {
  */
 app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
   let username = req.body.username;
+  let transcript = req.body.transcript || undefined;
 
   if (username === undefined) {
     res.status(400).end('Error: no user specified');
@@ -170,19 +175,60 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     let audioObject = {
       "link": baseURL + uniqueFileName,
       "creator": username,
-      "tags": ""
+      "tags": "",
+      "transcript": transcript
     }
 
-    db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
-            [ audioObject.link, audioObject.creator, audioObject.tags ],
-            db.connection,
-            function (err, result, fields) {
+    // Legacy handler
+    if (transcript === undefined) {
+      console.log(`[/api/upload] Request received with no transcript; using legacy handler`);
+      db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
+              [ audioObject.link, audioObject.creator, audioObject.tags ],
+              db.connection,
+              function (err, result, fields) {
 
-      res.status(200);
-      res.end(JSON.stringify(audioObject));
-    });
+        res.status(200);
+        res.end(JSON.stringify(audioObject));
+      });
+    }
+
+    // New handler for transcript uploads
+    if (transcript !== undefined) {
+      console.log(`[/api/upload] Request received with transcript; using new handler.`);
+      console.log(`[/api/upload] => Transcript received: ${transcript}`);
+
+      db.exec('INSERT INTO audio (link, creator, tags, transcript) VALUES (?, ?, ?, ?)',
+              [ audioObject.link, audioObject.creator, audioObject.tags, transcript ],
+              db.connection,
+              function (err, result, fields) {
+
+        // console.log(`err: ${err}, res: ${result}, fields: ${fields}`);
+
+        res.status(200);
+        res.end(JSON.stringify(audioObject));
+
+      });
+    }
   });
+});
 
+// New handler for getting NLP events. Should have authentication check but disabled for testing
+app.get(app.prefix + 'get_events', (req, res) => {
+  // const events = extractEvents()
+  let username = req.query.username;
+
+  db.exec('SELECT transcript FROM audio WHERE creator LIKE ?', [ username ], db.connection, function (err, results, fields) {
+    console.log(`[/api/get_events] Result: ${JSON.stringify(results)}`);
+
+    let events = [];
+
+    results.forEach(function(result, index) {
+      let transcriptEvents = nlp.extractEvents(result.transcript, username);
+      events.push.apply(events, transcriptEvents);
+    });
+
+    res.status(200).end(JSON.stringify(events));
+  });
 });
 
 /**
