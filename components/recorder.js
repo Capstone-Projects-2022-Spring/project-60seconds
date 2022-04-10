@@ -75,13 +75,21 @@ export default function recorder() {
 		recording.getStatusAsync()
 			.then(function (result) {
 				console.log("The duration is: " + result.durationMillis)
-				updatedRecordings.push({
-					sound: sound,
-					duration: getDurationFormatted(result.durationMillis),
-					file: recording.getURI()
-				});
+
+				if (result.durationMillis > 60000) {
+					alert("Recordings must be less than 60 seconds in duration");
+				} else {
+					updatedRecordings.pop();
+					updatedRecordings.push({
+						sound: sound,
+						duration: getDurationFormatted(result.durationMillis),
+						file: recording.getURI()
+					});
+					setRecordings(updatedRecordings);
+				}
 			})
 			.catch(failureCallback);
+
 
 		function failureCallback(error) {
 			console.error("Error generating audio file: " + error);
@@ -90,7 +98,6 @@ export default function recorder() {
 
 
 		setRecordings(updatedRecordings);
-
 		let user = await axios.get('https://api.60seconds.io/api/user');
 		sendToServer(recording, user.data.username);
 	}
@@ -109,7 +116,7 @@ export default function recorder() {
 		return recordings.map((recordingLine, index) => {
 			return (
 				<View key={index} style={StyleSheet.row}>
-					<Text style={styles.fill}>Recording {index + 1} - {recordingLine.duration}</Text>
+					<Text style={styles.fill}>Recording - {recordingLine.duration}</Text>
 					<Button style={styles.button} onPress={() => recordingLine.sound.replayAsync()} title="Play"></Button>
 				</View>
 			);
@@ -180,8 +187,8 @@ const styles = StyleSheet.create({
 	},
 	row: {
 		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
 	},
 	fill: {
 		flex: 1,
