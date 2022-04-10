@@ -18,26 +18,42 @@ export default function Day({parentToChild}) {
       setData(linkToSet.toString());
     }
 
-    axios.get('https://api.60seconds.io/api/user').then(function(response) {
-      username = response.data.username;
+    useEffect(() => {
+      axios.get('https://api.60seconds.io/api/user').then(function(response) {
+        username = response.data.username;
 
-      axios.get('https://api.60seconds.io/api/get_links', {
+        axios.get('https://api.60seconds.io/api/get_events', {
           params: {
             username: username,
-            date: selectedDateString
           }
         }).then(function (response) {
           if(response.data.length == 0){
-            parentToChild2('No recordings made this day.');
+            console.log("no events returned")
           } else {
-            //for milestone demo 2, it plays the most recent recording returned from the query
-            parentToChild2(response.data[response.data.length - 1].link);
+            console.log(response.data);
           }
         }).catch(function (error) {
           console.log(error);
         });
 
-    });
+        axios.get('https://api.60seconds.io/api/get_links', {
+            params: {
+              username: username,
+              date: selectedDateString
+            }
+          }).then(function (response) {
+            if(response.data.length == 0){
+              parentToChild2('No recordings made this day.');
+            } else {
+              //for milestone demo 2, it plays the most recent recording returned from the query
+              parentToChild2(response.data[response.data.length - 1].link);
+            }
+          }).catch(function (error) {
+            console.log(error);
+          });
+
+      });
+    }, []);
 
 
 
