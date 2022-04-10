@@ -11,6 +11,8 @@ import { duration } from '@mui/material';
 
 axios.defaults.withCredentials = true;
 
+let globalTranscript = '';
+
 export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
@@ -57,7 +59,10 @@ export default function recorder() {
 
 		let uploadData = new FormData();
 		uploadData.append('username', username);
+		uploadData.append('transcript', globalTranscript);
 		uploadData.append('audio', audioFile);
+
+		globalTranscript = '';
 
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
@@ -99,7 +104,14 @@ export default function recorder() {
 
 		setRecordings(updatedRecordings);
 		let user = await axios.get('https://api.60seconds.io/api/user');
-		sendToServer(recording, user.data.username);
+
+		console.log(`Waiting 2s then sending the recording to the server`);
+		setTimeout(function() {
+			console.log(`globalTranscript before sent: ${globalTranscript}`);
+			sendToServer(recording, user.data.username);
+
+		}, 2000);
+		// sendToServer(recording, user.data.username);
 	}
 
 	function getDurationFormatted(millis) {
@@ -128,7 +140,7 @@ export default function recorder() {
 		var transcriptFinal = '';
 		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		const recognition = new SpeechRecognition();
-		recognition.interimResults = true;
+		recognition.interimResults = false;
 		const words = document.querySelector('.words');
 		words.appendChild(content);
 
@@ -138,16 +150,25 @@ export default function recorder() {
 				.map(result => result.transcript)
 				.join('');
 
-			document.getElementById('content').innerHTML = transcript;
-			console.log(transcript);
+			console.log(`Result found: ${transcript}`);
 			transcriptFinal = transcriptFinal + transcript;
+			globalTranscript += transcriptFinal;
+
+			document.getElementById('content').innerHTML = globalTranscript;
+
 		});
 
 		if (speech === true) {
 			recognition.start();
-			recognition.addEventListener('end', recognition.start);
+			recognition.addEventListener('end', function(e) {
+				document.getElementById('content').innerHTML = globalTranscript;
+
+				globalTranscript += ' . ';
+				console.log(`GLOBAL TRANSCRIPT: ${globalTranscript}`);
+			});
+
 		}
-		console.log(transcriptFinal);
+		// console.log(transcriptFinal);
 	}
 
 	return (
