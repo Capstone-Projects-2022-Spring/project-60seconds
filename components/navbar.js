@@ -118,7 +118,7 @@ export default function Navbar(props) {
                                     Profile
                                 </Button>
 
-                                <Button key="About" component={Link} to="/profile" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
+                                <Button key="About" component={Link} to="/about" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     About
                                 </Button>
 
