@@ -15,7 +15,6 @@ export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
-	let isRecording = false;
 
 	async function startRecording() {
 		try {
@@ -31,8 +30,7 @@ export default function recorder() {
 			);
 			setRecording(recording);
 			console.log('Recording started');
-			isRecording = true;
-			startTranscribe();
+			transcription();
 		} catch (err) {
 			console.error('Failed to start recording', err);
 		}
@@ -99,8 +97,7 @@ export default function recorder() {
 
 
 
-		isRecording = false;
-
+		setRecordings(updatedRecordings);
 		let user = await axios.get('https://api.60seconds.io/api/user');
 		sendToServer(recording, user.data.username);
 	}
@@ -126,27 +123,31 @@ export default function recorder() {
 		});
 	}
 
-	function startTranscribe() {
-		var output = document.getElementById("content");
-		var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-		var recognition = new SpeechRecognition();
-		recognition.onstart = function () {
-			if (isRecording) {
-				console.log('is recording, start speech to text');
-			}
-		};
+	function transcription() {
+		var speech = true;
+		var transcriptFinal = '';
+		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const recognition = new SpeechRecognition();
+		recognition.interimResults = true;
+		const words = document.querySelector('.words');
+		words.appendChild(content);
 
-		recognition.onspeechend = function () {
-			console.log('is not recording, end speech to text');
-			recognition.stop();
+		recognition.addEventListener('result', e => {
+			const transcript = Array.from(e.results)
+				.map(result => result[0])
+				.map(result => result.transcript)
+				.join('');
+
+			document.getElementById('content').innerHTML = transcript;
+			console.log(transcript);
+			transcriptFinal = transcriptFinal + transcript;
+		});
+
+		if (speech === true) {
+			recognition.start();
+			recognition.addEventListener('end', recognition.start);
 		}
-
-		recognition.onresult = function (event) {
-			var transcript = event.results[0][0].transcript;
-			output.innerHTML = transcript;
-			output.classList.remove("hide");
-		};
-		recognition.start();
+		console.log(transcriptFinal);
 	}
 
 	return (
