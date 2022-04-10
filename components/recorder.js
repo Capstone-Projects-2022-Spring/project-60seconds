@@ -62,7 +62,6 @@ export default function recorder() {
 		uploadData.append('transcript', globalTranscript);
 		uploadData.append('audio', audioFile);
 
-
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
 	}
@@ -160,7 +159,6 @@ export default function recorder() {
 			// recognition.addEventListener('end', recognition.start);
 			recognition.addEventListener('end', function(e) {
 				console.log(`GLOBAL TRANSCRIPT: ${globalTranscript}`);
-
 			});
 
 		}
