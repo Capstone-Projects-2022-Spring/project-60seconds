@@ -4,11 +4,15 @@
     height: auto;
     margin-left: 30px;
     margin-top: 30px;
+    float: left;
+    align-items: center;
 }
 
 .profile-picture {
-    width: 400px;
-    height: 400px;
+    width: 380px;
+    height: 380px;
+    margin-left: 10px;
+    margin-top: 10px;
 }
 
 .profile-column-info {
@@ -16,9 +20,11 @@
 
 .username {
     text-align: center;
+    font-size: 30px;
 }
 
 p {
+    margin-left: 10px;
     font-size: 20px;
 }
 
@@ -27,7 +33,7 @@ p {
     height: 40px;
     font-size: 25px;
     background-color: #4d98cf;
-    color: #e0e0e0;
+    color: #ffffff;
     border-style: none;
 }
 
@@ -37,5 +43,49 @@ p {
 
 .event-column {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    float: left;
+    margin-left: 30px;
+    margin-top: 30px;
+    width: 900px;
+    height: fit-content;
 }
 
+.event {
+    text-align: center;
+}
+
+.ads-section {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    float: right;
+    margin-left: 30px;
+    margin-top: 30px;
+    width: 400px;
+    align-items: center;
+    text-align: center;
+}
+
+.shameless-ads-label {
+    margin-left: 10px;
+    margin-top: 10px;
+    width: 380px;
+    background-color: #4d98cf;
+    color: #ffffff;
+}
+
+.about-me {
+    margin-top: -10px;
+    margin-right: 10px;
+    min-height: 40px;
+    border-style: solid;
+    border-color: #4d98cf;
+}
+
+.ad-pic-1 {
+    margin-top: -10px;
+    width: 380px;
+}
+
+.ad-pic-2 {
+    margin-top: 10px;
+    width: 380px;
+}
