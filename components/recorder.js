@@ -16,7 +16,8 @@ export default function recorder() {
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
 	let isRecording = false;
-	let helper = 0;
+	let user;
+	let username;
 
 
 	async function startRecording() {
@@ -53,6 +54,7 @@ export default function recorder() {
 
 		// Get URI of the recording
 		let audioURI = recording.getURI();
+		console.log("URI: " + audioURI);
 
 		// Convert URI to blob
 		let audioBlob = await fetch(audioURI).then(r => r.blob());
@@ -66,6 +68,7 @@ export default function recorder() {
 
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
+		console.log("Sent to server!!!");
 	}
 
 	async function stopRecording() {
@@ -73,7 +76,7 @@ export default function recorder() {
 		let updatedRecordings = [...recordings];
 
 		console.log('Stopping recording..');
-		setRecording(undefined);
+		setRecording(recording);
 		await recording.stopAndUnloadAsync();
 		const { sound, status } = await recording.createNewLoadedSoundAsync();
 
@@ -104,24 +107,10 @@ export default function recorder() {
 
 		isRecording = false;
 
-		let user = await axios.get('https://api.60seconds.io/api/user');
-		const username = user.data.username;
-
-		if (helper > 0)
-			sendToServerHelper(recording, username);
-		else
-			console.log("submit not pressed");
-
+		user = await axios.get('https://api.60seconds.io/api/user');
+		username = user.data.username;
 	}
 
-	function sendToServerHelper(recording, username) {
-		console.log("in helper with value: " + helper);
-		sendToServer(recording, username);
-	}
-
-	function increaseCounter() {
-		helper++;
-	}
 
 	function getDurationFormatted(millis) {
 		console.log("FORMATTING..." + millis);
@@ -187,7 +176,8 @@ export default function recorder() {
 				{getRecordingLines()}
 				<Button
 					title={'Submit'}
-					onPress={increaseCounter}
+					type="submit"
+					onPress={ () => sendToServer(recording, username) }
 					fullWidth
 					sx={{ mt: 3, mb: 2 }}
 				/>
