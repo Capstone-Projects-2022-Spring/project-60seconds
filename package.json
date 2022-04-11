@@ -15,6 +15,7 @@
     "@mui/icons-material": "^5.4.2",
     "@mui/material": "^5.4.3",
     "@mui/styles": "^5.4.2",
+    "@pathofdev/react-tag-input": "^1.0.7",
     "axios": "^0.26.1",
     "date-fns": "^2.28.0",
     "expo": "~44.0.0",
