@@ -11,7 +11,18 @@ import { duration } from '@mui/material';
 
 axios.defaults.withCredentials = true;
 
-let globalTranscript;
+
+// Made these global variables for testing
+let globalTranscript = '';
+
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.interimResults = false;
+recognition.continuous = true;
+
+
+
+
 
 export default function recorder() {
 
@@ -103,6 +114,8 @@ export default function recorder() {
 		setRecordings(updatedRecordings);
 		let user = await axios.get('https://api.60seconds.io/api/user');
 
+		recognition.stop();
+
 		console.log(`Waiting 2s then sending the recording to the server`);
 		setTimeout(function() {
 			console.log(`globalTranscript before sent: ${globalTranscript}`);
@@ -134,13 +147,26 @@ export default function recorder() {
 	}
 
 	function transcription() {
+		globalTranscript = '';
+
 		var speech = true;
-		var transcriptFinal = '';
-		window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		const recognition = new SpeechRecognition();
-		recognition.interimResults = false;
+
 		const words = document.querySelector('.words');
 		words.appendChild(content);
+
+		// Weird trick for inserting periods at natural pause points
+		let periodIndices = [];
+
+		let insertPeriods = function(transcript, periodIndices) {
+			let fixedTranscript = transcript;
+
+			for (let i = periodIndices.length - 1; i >= 0; i--) {
+				fixedTranscript = fixedTranscript.slice(0, periodIndices[i]) + '.' + fixedTranscript.slice(periodIndices[i]);
+
+			}
+
+			return fixedTranscript;
+		}
 
 		recognition.addEventListener('result', e => {
 			const transcript = Array.from(e.results)
@@ -148,17 +174,27 @@ export default function recorder() {
 				.map(result => result.transcript)
 				.join('');
 
-			document.getElementById('content').innerHTML = transcript;
-			console.log(`Result found: ${transcript}`);
-			transcriptFinal = transcriptFinal + transcript;
-			globalTranscript = transcriptFinal;
+			console.log(`[transcription] Period index: ${transcript.length}`);
+			periodIndices.push(transcript.length);
+
+			console.log(`[transcription] Result event received: ${transcript}`);
+			globalTranscript = transcript;
+
+			document.getElementById('content').innerHTML = globalTranscript;
+
 		});
 
 		if (speech === true) {
 			recognition.start();
-			// recognition.addEventListener('end', recognition.start);
+
+
 			recognition.addEventListener('end', function(e) {
-				console.log(`GLOBAL TRANSCRIPT: ${globalTranscript}`);
+				globalTranscript = insertPeriods(globalTranscript, periodIndices);
+
+			  periodIndices = [];
+
+				document.getElementById('content').innerHTML = globalTranscript;
+				console.log(`[transcription] Recognition 'end' event received. globalTranscript: ${globalTranscript}`);
 			});
 
 		}
