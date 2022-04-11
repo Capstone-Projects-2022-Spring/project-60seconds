@@ -5,6 +5,8 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { Recording } from 'expo-av/build/Audio';
 import { StatusBar } from 'expo-status-bar';
+import "@pathofdev/react-tag-input/build/index.css";
+import ReactTagInput from "@pathofdev/react-tag-input";
 
 import axios from 'axios';
 import { duration } from '@mui/material';
@@ -29,6 +31,8 @@ export default function recorder() {
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
 
+	const [tags, setTags] = React.useState([])
+
 	async function startRecording() {
 		try {
 			console.log('Requesting permissions..');
@@ -52,6 +56,8 @@ export default function recorder() {
 	async function sendToServer(recording, username) {
 		const fileName = '60seconds-audio.mp3'
 
+		console.log("Tags: " + tags);
+
 		// SO snippet
 		let blobToFile = function (blob, fileName) {
 			const file = new File([blob], fileName, { type: blob.type });
@@ -72,9 +78,11 @@ export default function recorder() {
 		uploadData.append('username', username);
 		uploadData.append('transcript', globalTranscript);
 		uploadData.append('audio', audioFile);
+		uploadData.append('tags', tags);
 
 		let apiUploadPath = 'https://api.60seconds.io/api/upload';
 		axios.post(apiUploadPath, uploadData);
+		console.log("successfuly sent to server!");
 	}
 
 	async function stopRecording() {
@@ -117,7 +125,7 @@ export default function recorder() {
 		recognition.stop();
 
 		console.log(`Waiting 2s then sending the recording to the server`);
-		setTimeout(function() {
+		setTimeout(function () {
 			console.log(`globalTranscript before sent: ${globalTranscript}`);
 			sendToServer(recording, user.data.username);
 
@@ -186,8 +194,6 @@ export default function recorder() {
 
 		if (speech === true) {
 			recognition.start();
-
-
 			recognition.addEventListener('end', function(e) {
 				globalTranscript = insertPeriods(globalTranscript, periodIndices);
 
@@ -223,6 +229,11 @@ export default function recorder() {
 				<div className="words" contentEditable suppressContentEditableWarning>
 					<p id='content'></p>
 				</div>
+				<ReactTagInput
+					tags={tags}
+					placeholder="Custom Tagging"
+					onChange={(newTags) => setTags(newTags)}
+				/>
 			</Box>
 		</Container>
 
