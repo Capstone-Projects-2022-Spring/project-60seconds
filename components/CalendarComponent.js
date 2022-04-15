@@ -6,7 +6,10 @@ import Container from "@mui/material/Container";
 import Box from '@mui/material/Box'
 import Day from '../components/day';
 
-export default function calendar({datesReturned}) {
+export default function calendar({datesReturned, usernameReturned, eventsReturned}) {
+
+    let username = usernameReturned;
+    let events = eventsReturned;
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [activeDate, setActiveDate] = useState(new Date())
@@ -151,7 +154,7 @@ export default function calendar({datesReturned}) {
                     {getWeekDaysNames()}
                     {getDates()}
                 </Container>
-                <Day parentToChild={data}/>
+                <Day parentToChild={data} usernameReceived={username} eventsReceived={events}/>
             </Box>
         </div>
     )
