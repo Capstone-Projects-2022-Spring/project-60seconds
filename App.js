@@ -6,7 +6,7 @@ import Calendar from './Pages/Calendar';
 import Profile from './Pages/Profile'
 import Record from './Pages/Record';
 import ErrorPage from './Pages/ErrorPage';
-import Register from './components/register';
+import RegisterPage from './Pages/RegisterPage';
 import Logout from './components/logout';
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import React from 'react';
@@ -25,7 +25,7 @@ export default function App() {
         <Route path="/" element={<Home/>}/>
         <Route path="/About" element={<About/>}/>
         <Route path="/Login" element={<Login getLoginState={getLoginState} />}/>
-        <Route path="/Register" element={<Register/>}/>
+        <Route path="/Register" element={<RegisterPage/>}/>
         <Route path="/Logout" element={<Logout getLoginState={getLoginState}/>}/>
         <Route path="/Calendar" element={<Calendar/>}/>
         <Route path="/Record" element={<Record/>}/>
