@@ -26,8 +26,6 @@ const auth = require('./auth')
 // New for NLP handling
 const nlp = require('./nlp');
 
-
-
 const app = express();
 
 // Enable express-session middleware
@@ -180,7 +178,7 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     }
 
     // Legacy handler
-    if (transcript === undefined) {
+    if (audioObject.ranscript === undefined) {
       console.log(`[/api/upload] Request received with no transcript; using legacy handler`);
       db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
               [ audioObject.link, audioObject.creator, audioObject.tags ],
@@ -198,23 +196,31 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
       console.log(`[/api/upload] => Transcript received: ${transcript}`);
 
       db.exec('INSERT INTO audio (link, creator, tags, transcript) VALUES (?, ?, ?, ?)',
-              [ audioObject.link, audioObject.creator, audioObject.tags, transcript ],
+              [ audioObject.link, audioObject.creator, audioObject.tags, audioObject.transcript ],
               db.connection,
               function (err, result, fields) {
-
         // console.log(`err: ${err}, res: ${result}, fields: ${fields}`);
-
-        res.status(200);
-        res.end(JSON.stringify(audioObject));
-
       });
+
+      let events = [];
+      let transcriptEvents = nlp.extractEvents(audioObject.transcript, audioObject.creator);
+      events.push.apply(events, transcriptEvents);
+
+      events.forEach((event, i) => {
+        db.exec('INSERT INTO events (audio_id, creator, timestamp, description) VALUES (?, ?, ?, ?)', [ 0, audioObject.creator, event.time, event.description ], db.connection, function(err, result, fields) {
+          // Do nothing
+        });
+      });
+
+      res.status(200);
+      res.end(JSON.stringify(audioObject));
+
     }
   });
 });
 
-// New handler for getting NLP events. Should have authentication check but disabled for testing
+// Legacy handler for getting NLP events. Should have authentication check but disabled for testing
 app.get(app.prefix + 'get_events', (req, res) => {
-  // const events = extractEvents()
   let username = req.query.username;
 
   db.exec('SELECT transcript FROM audio WHERE creator LIKE ?', [ username ], db.connection, function (err, results, fields) {
@@ -228,6 +234,19 @@ app.get(app.prefix + 'get_events', (req, res) => {
     });
 
     res.status(200).end(JSON.stringify(events));
+  });
+});
+
+// New handler for getting NLP events correctly from the database. Should have authentication check but disabled for testing
+app.get(app.prefix + 'get_all_events', (req, res) => {
+  let username = req.query.username;
+
+  if (username === undefined) {
+    res.status(400).end('Error: no user specified');
+  }
+
+  db.exec('SELECT * FROM events WHERE creator LIKE ?', [ username ], db.connection, function (err, result, fields) {
+    res.status(200).end(JSON.stringify(result));
   });
 });
 
