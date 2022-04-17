@@ -178,7 +178,7 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     }
 
     // Legacy handler
-    if (audioObject.ranscript === undefined) {
+    if (audioObject.transcript === undefined) {
       console.log(`[/api/upload] Request received with no transcript; using legacy handler`);
       db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
               [ audioObject.link, audioObject.creator, audioObject.tags ],
