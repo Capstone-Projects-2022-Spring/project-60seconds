@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { Text, View } from 'react-native';
-import HomePageComponent from '../components/HomePageComponent';
+import styles from '../App.style';
+import Register from '../components/register'
 
-
-export default function Home() {
+export default function RegisterPage() {
+  
   return (
-    <View>
+    <View style={styles.pages}>
       <div className="App">
-        <HomePageComponent />
+          <Register />
         <StatusBar style="auto" />
       </div>
     </View>

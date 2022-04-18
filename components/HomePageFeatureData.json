@@ -1,0 +1,25 @@
+{
+"Features": [
+    {
+      "title": "Audio Recording",
+      "text": "Record and store audio for user to playback"
+    },
+    {
+      "title": "Calendar organizer",
+      "text": "Display user's daily recordings and events"
+    },
+    {
+      "title": "Content Tagging",
+      "text": "Users can add tags to custom content they upload"
+    },
+    {
+
+      "title": "Audio Analysis",
+      "text": "Speech to text transcription of audio recordings using Amazon AWS’s Speech to Text service"
+    },
+    {
+      "title": "Natural Language Processing",
+      "text": "Extract event name, location and time information from the text converted from audio"
+    }
+  ]
+}
