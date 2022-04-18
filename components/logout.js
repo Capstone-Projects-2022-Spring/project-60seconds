@@ -14,7 +14,9 @@ export default function logout(props){
   props.getLoginState(localStorage.getItem('username'));
 
   return(
-      <p>User successfully logged out!</p>
+      <p>User successfully logged out!{setTimeout(function(){
+        window.location.href = '/';
+     }, 3000)}</p>
   )
   
 }
