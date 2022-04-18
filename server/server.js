@@ -214,12 +214,12 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
 
       res.status(200);
       res.end(JSON.stringify(audioObject));
-
     }
   });
 });
 
-// Legacy handler for getting NLP events. Should have authentication check but disabled for testing
+// *** REMOVE THIS ONCE THE CALENDAR IS WORKING ***
+// Legacy handler for getting NLP events - only here so the calendar keeps working before it gets updated. Should have authentication check but disabled for testing
 app.get(app.prefix + 'get_events', (req, res) => {
   let username = req.query.username;
 
@@ -245,10 +245,64 @@ app.get(app.prefix + 'get_all_events', (req, res) => {
     res.status(400).end('Error: no user specified');
   }
 
-  db.exec('SELECT * FROM events WHERE creator LIKE ?', [ username ], db.connection, function (err, result, fields) {
+  db.exec('SELECT * FROM events WHERE creator LIKE ?', [ username ], db.connection, function(err, result, fields) {
     res.status(200).end(JSON.stringify(result));
   });
 });
+
+// New handler for deleting NLP generated events from the database.
+
+/**
+ * POST /api/delete_event
+ * (authentication required)
+ */
+app.post(app.prefix + 'delete_event', (req, res) => {
+  let event_id = req.body.event_id;
+  let username = req.body.username;
+
+  db.exec('DELETE FROM events WHERE event_id LIKE ? and creator LIKE ?', [ event_id, username ], db.connection, function(err, result, fields) {
+    res.status(200).end('true');
+  });
+});
+
+// UPDATE table_name
+// SET column1 = value1, column2 = value2, ...
+// WHERE condition;
+
+/**
+ * POST /api/update_event
+ * (authentication required)
+ */
+app.post(app.prefix + 'update_event', (req, res) => {
+  let event_id = req.body.event_id;
+  let username = req.body.username
+  let eventJSON = req.body.event;
+
+  let eventObject;
+  //
+  console.log(event_id, username, eventJSON);
+
+  try {
+    decoded = decodeURIComponent(eventJSON); // print(eventObject);
+
+    console.log(decoded);
+
+    eventObject = JSON.parse((decoded));
+
+  } catch (e) {
+    console.error(new Error(`Error parsing JSON: {e}`));
+
+    res.status(400).end
+  }
+
+  if (typeof eventObject !== undefined && typeof eventObject.timestamp !== undefined && typeof eventObject.description !== undefined) {
+    db.exec('UPDATE events SET timestamp = ?, description = ? WHERE creator = ? AND event_id = ?', [ eventObject.timestamp, eventObject.description, username, event_id ], db.connection, function(err, result, fields) {
+      console.log(`Updated!`);
+      res.status(200).end('true');
+    });
+  }
+});
+
 
 /**
  * GET /api/get_links
@@ -270,7 +324,6 @@ app.get(app.prefix + 'get_links', auth.authenticationCheck, (req, res) => {
     res.status(200).end(JSON.stringify(result));
   });
 });
-
 
 /**
  * GET /api/get_recording_dates
