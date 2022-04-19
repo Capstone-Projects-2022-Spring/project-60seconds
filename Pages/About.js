@@ -1,6 +1,4 @@
-import { View } from 'react-native';
 import Container from "@mui/material/Container";
-import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
@@ -9,21 +7,19 @@ import ryanPhoto from '../assets/ryan.png';
 import zachPhoto from '../assets/zach.jpg';
 import xuPhoto from '../assets/xu.jpg'
 import zackPhoto from '../assets/zack.jpg'
-import styles from '../App.style';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+let theme = createTheme();
 
 export default function About() {
   return (
-    <View style={styles.pages}>
+    <ThemeProvider theme={theme}>
       <div className="App">
-		  <Container component="main" maxWidth="lg">
-				<CssBaseline />
+		  <Container component="main">
 				<Box
 					sx={{
 						marginTop: 8,
             marginBottom: 3,
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "left",
 					}}
 				>
           <Typography>
@@ -38,6 +34,7 @@ export default function About() {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            flexWrap: 'wrap'
           }}
         >
           <Box
@@ -113,6 +110,6 @@ export default function About() {
         </Box>
       </Container>
       </div>
-    </View>
+    </ThemeProvider>
   );
 }
