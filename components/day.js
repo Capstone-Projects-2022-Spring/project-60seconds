@@ -13,12 +13,11 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
   
     let selectedDateString = parentToChild.getFullYear() + '-' + (parentToChild.getMonth()+1) + '-' + parentToChild.getDate();
     let selectedDateStringAsDate = new Date(selectedDateString);
-    let selectedDateEventDescription = "";
-    let selectedDateEventTime = "";
+
     //console.log(selectedDateString);
     const [data, setData] = useState('');
-    const [eventDescription, setEventDescription] = useState('');
-    const [eventTime, setEventTime] = useState('');
+    const [eventDescription, setEventDescription] = useState("No events.");
+    const [eventTime, setEventTime] = useState("");
 
     const parentToChild2 = (linkToSet) => {
       setData(linkToSet.toString());
@@ -51,9 +50,8 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
 
     Object.entries(eventsReceived).forEach(entry => {
         const [key, value] = entry;
+        //console.log(isSameDay(value.eventDate, selectedDateStringAsDate));
         if(isSameDay(value.eventDate, selectedDateStringAsDate)){
-          //console.log(value.eventDate);
-          //console.log(value.eventDescription)
           descriptionToChild(value.eventDescription);
           timeToChild(value.eventDate.toLocaleTimeString());
         } 

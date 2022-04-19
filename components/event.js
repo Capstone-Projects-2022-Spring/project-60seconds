@@ -2,9 +2,8 @@ import React, {useState} from "react";
 
 export default function description({descriptionToChild, time}){
 
+    
     console.log(descriptionToChild);
-    console.log(time);
-    //console.log(descriptionToChild);
     if(!descriptionToChild.toString().includes("No") && time !== ""){
         return (
             <p>{descriptionToChild + " at " + time}</p>
