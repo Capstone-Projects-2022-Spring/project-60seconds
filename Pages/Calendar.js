@@ -9,6 +9,13 @@ export default function Calendar() {
     let localusername = '';
     let datesReturned = [];
     let eventsReturned = [];
+
+    class Event{
+      constructor(date, description){
+        this.eventDate = date;
+        this.eventDescription = description;
+      }
+    }
     
     const [username, setUsername] = useState('');
     const [events, setEvents] = useState([]);
@@ -21,26 +28,37 @@ export default function Calendar() {
           localusername = response.data.username;
           usernameToChild(localusername)
 
-      axios.get('https://api.60seconds.io/api/get_events', {
-          params: {
-            username: localusername,
-          }
-      })
-        .then(function (response) {
-          if(response.data.length == 0){
-            console.log('no events found in user\'s recordings');
-          } else {
-            //parse through api response and add push objects returned to array
-            Object.entries(response.data).forEach(entry => {
-              const [key, value] = entry;
-              eventsReturned.push(value);
-            })
-            eventsToChild(eventsReturned);
-          }
-        }) 
-        .catch(function (error) {
-          console.log(error);
-        });
+          axios.get('https://api.60seconds.io/api/get_events', {
+            params: {
+              username: localusername,
+            }
+          }).then(function (response) {  
+            if(response.data.length == 0){
+              //console.log("no events returned")
+            } else {
+              Object.entries(response.data).forEach(entry => {
+                const [key, value] = entry;
+    
+                let eventDate = new Date(value.time);
+                eventDate.setHours(eventDate.getHours() + 4)
+    
+                const event = new Event(eventDate, value.description);
+                eventsReturned.push(event);
+    
+                /*if(isSameDay(event.eventDate, selectedDateStringAsDate)){
+                  descriptionToChild(value.description);
+                  timeToChild(event.eventDate.toLocaleTimeString());
+                } else if(!isSameDay(event.eventDate, selectedDateStringAsDate)){
+                  descriptionToChild("No events.");
+                }*/
+                
+                eventsToChild(eventsReturned);
+              })
+              //console.log(events);
+            }
+          }).catch(function (error) {
+            console.log(error);
+          });
 
       //api call to get dates of recordings made by a user
       axios.get('https://api.60seconds.io/api/get_recording_dates', {
@@ -67,7 +85,7 @@ export default function Calendar() {
 
       const eventsToChild = (eventstopass) => {
         eventstopass = eventstopass.slice(0);
-        console.log(eventstopass);
+        //console.log(eventstopass);
         setEvents(eventstopass);
       }
 

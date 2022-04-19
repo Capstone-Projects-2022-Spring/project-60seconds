@@ -13,17 +13,12 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
   
     let selectedDateString = parentToChild.getFullYear() + '-' + (parentToChild.getMonth()+1) + '-' + parentToChild.getDate();
     let selectedDateStringAsDate = new Date(selectedDateString);
+    let selectedDateEventDescription = "";
+    let selectedDateEventTime = "";
     //console.log(selectedDateString);
     const [data, setData] = useState('');
     const [eventDescription, setEventDescription] = useState('');
     const [eventTime, setEventTime] = useState('');
-
-    class Event{
-      constructor(date, description){
-        this.eventDate = date;
-        this.eventDescription = description;
-      }
-    }
 
     const parentToChild2 = (linkToSet) => {
       setData(linkToSet.toString());
@@ -36,37 +31,7 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
     const timeToChild = (timeToSet) => {
       setEventTime(timeToSet);
     }
-
-    //the 
-      axios.get('https://api.60seconds.io/api/get_events', {
-        params: {
-          username: usernameReceived,
-        }
-      }).then(function (response) {  
-        if(response.data.length == 0){
-          //console.log("no events returned")
-        } else {
-          Object.entries(response.data).forEach(entry => {
-            const [key, value] = entry;
-
-            let eventDate = new Date(value.time);
-            eventDate.setHours(eventDate.getHours() + 4)
-
-            const event = new Event(eventDate, value.description);
-
-            if(isSameDay(event.eventDate, selectedDateStringAsDate)){
-              descriptionToChild(value.description);
-              timeToChild(event.eventDate.toLocaleTimeString());
-            } else if(!isSameDay(event.eventDate, selectedDateStringAsDate)){
-              descriptionToChild("No events.");
-            }
-          })
-          //console.log(events);
-        }
-      }).catch(function (error) {
-        console.log(error);
-      });
-
+    
     useEffect(() => {
     axios.get('https://api.60seconds.io/api/get_links', {
         params: {
@@ -83,7 +48,18 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
       }).catch(function (error) {
         console.log(error);
     });
-  });
+
+    Object.entries(eventsReceived).forEach(entry => {
+        const [key, value] = entry;
+        if(isSameDay(value.eventDate, selectedDateStringAsDate)){
+          //console.log(value.eventDate);
+          //console.log(value.eventDescription)
+          descriptionToChild(value.eventDescription);
+          timeToChild(value.eventDate.toLocaleTimeString());
+        } 
+    })
+  })
+  
 
   return(
     <div className="dayBox">
