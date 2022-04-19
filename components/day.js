@@ -48,14 +48,19 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
         console.log(error);
     });
 
+    let stringdescriptiontopass = "No events.";
+    let timestringtopass = "";
     Object.entries(eventsReceived).forEach(entry => {
         const [key, value] = entry;
-        //console.log(isSameDay(value.eventDate, selectedDateStringAsDate));
+        console.log(isSameDay(value.eventDate, selectedDateStringAsDate));
         if(isSameDay(value.eventDate, selectedDateStringAsDate)){
-          descriptionToChild(value.eventDescription);
-          timeToChild(value.eventDate.toLocaleTimeString());
+          stringdescriptiontopass = value.eventDescription;
+          timestringtopass = value.eventDate.toLocaleTimeString();
         } 
     })
+    
+    descriptionToChild(stringdescriptiontopass);
+    timeToChild(timestringtopass);
   })
   
 
