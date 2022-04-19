@@ -48,19 +48,23 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
         console.log(error);
     });
 
-    let stringdescriptiontopass = "No events.";
-    let timestringtopass = "";
+    //default values of event data, reset upon each new date selected on calendar
+    let stringDescriptionToPass = "No events.";
+    let timeStringToPass = "";
+
     Object.entries(eventsReceived).forEach(entry => {
         const [key, value] = entry;
-        console.log(isSameDay(value.eventDate, selectedDateStringAsDate));
+
+        //event data values are only updated if a day with an associated event is selected
         if(isSameDay(value.eventDate, selectedDateStringAsDate)){
-          stringdescriptiontopass = value.eventDescription;
-          timestringtopass = value.eventDate.toLocaleTimeString();
+          stringDescriptionToPass = value.eventDescription;
+          timeStringToPass = value.eventDate.toLocaleTimeString();
         } 
     })
     
-    descriptionToChild(stringdescriptiontopass);
-    timeToChild(timestringtopass);
+    //event data values are passed with either default values or with associated event data 
+    descriptionToChild(stringDescriptionToPass);
+    timeToChild(timeStringToPass);
   })
   
 
