@@ -1,13 +1,16 @@
 import React, {useState} from "react";
 
 export default function description({descriptionToChild, time}){
-    if(descriptionToChild.includes("no")){
+
+    
+    //console.log(descriptionToChild);
+    if(!descriptionToChild.toString().includes("No") && time !== ""){
         return (
-            <br></br>
+            <p>{descriptionToChild + " at " + time}</p>
         )
     } else {
         return (
-            <p>{descriptionToChild + " at " + time}</p>
+            <p>{descriptionToChild}</p>
         )
     }
 }
