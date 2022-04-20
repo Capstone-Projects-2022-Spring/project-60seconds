@@ -16,6 +16,10 @@ const session = require('express-session');
 const http = require('http');
 const https = require('https');
 
+// Password hashing
+const bcrypt = require('bcrypt');
+const SALT_ROUNDS = 10;
+
 // Custom Imports
 const creds = require('./creds');
 const conf = require('./conf');
@@ -42,7 +46,7 @@ app.use(fileUpload());
 
 // If client is locally hosted (development), allow local request origins instead of foreign
 let origin = conf.mode === 'development' ? 'https://localhost:19006' : 'https://60seconds.io';
-app.use(cors( { credentials: true, origin: origin, } ));
+app.use(cors( { credentials: true, origin: origin } ));
 
 // Serve static files from /public
 app.use(express.static('public'))
@@ -63,6 +67,8 @@ app.get('/api', (req, res) => {
  * POST /login
  */
 app.post(app.prefix + 'login', async (req, res) => {
+    // TODO: Modularize this mess
+
     let username = req.body.username;
     let password = req.body.password;
 
@@ -72,18 +78,31 @@ app.post(app.prefix + 'login', async (req, res) => {
       req.session.destroy();
     }
 
-    db.exec('SELECT * FROM users WHERE username LIKE ? AND password LIKE ?', [ username, password ], db.connection, function(err, result, fields) {
+    db.exec('SELECT * FROM users_testing WHERE username LIKE ?', [ username ], db.connection,function(err, result, fields) {
+      console.log(`${JSON.stringify(result)}`);
       if (err) throw err;
 
       let parsedResult = JSON.parse(JSON.stringify(result))[0];
 
       // Login information correct
       if (result.length === 1) {
-          console.log(`[/api/login] Succesful login from ${username}:${password}, creating a new session`);
-          req.session.user = req.body.username;
-          res.status(200).end(req.body.username);
+          let userObject = parsedResult;
+
+          bcrypt.compare(password, userObject.hash, function(err, result) {
+            if (result === true) {
+              // Probably shouldn't print passwords to log files but I'm leaving this here for now
+
+              console.log(`[/api/login] Succesful login from ${username}:${password}, creating a new session`);
+              req.session.user = req.body.username;
+              res.status(200).end(req.body.username);
+            } else {
+              console.log('[/api/login] Unsuccesful login attempt (invalid password): ' + req.body.username + ':' + req.body.password);
+              res.status(401).end();
+            }
+          });
+
       } else {
-          console.log('[/api/login] Unsuccesful login attempt: ' + req.body.username + ':' + req.body.password);
+          console.log('[/api/login] Unsuccesful login attempt (invalid username): ' + req.body.username + ':' + req.body.password);
           res.status(401).end();
       }
     });
@@ -114,13 +133,83 @@ app.get(app.prefix + 'user', auth.authenticationCheck, (req, res) => {
 });
 
 /**
+ * GET /api/get_user_info
+ * (authentication required)
+ */
+ // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
+app.get(app.prefix + 'get_user_info', (req, res) => {
+  let username = req.session.user;
+  username = 'newuser'
+
+  db.exec('SELECT * FROM users_testing WHERE username LIKE ?', [ username ], db.connection, function(err, result, fields) {
+    let parsedResult = JSON.parse(JSON.stringify(result))[0];
+
+    if (result.length !== 1) {
+      res.end(400);
+    }
+
+    // Don't send hash over the api call
+    delete parsedResult.hash;
+
+    let objectString = JSON.stringify(parsedResult);
+
+    res.status(200).end(objectString);
+  });
+});
+
+/**
+ * POST /api/update_user_info
+ * (authentication required)
+ */
+// ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
+app.post(app.prefix + 'update_user_info', (req, res) => {
+  let username = req.session.user || null;
+  username = 'newuser';
+  let userFields = {
+    first_name: req.body.first_name || null,
+    last_name: req.body.last_name || null,
+    school: req.body.school || null,
+    occupation: req.body.occupation || null,
+    description: req.body.description || null
+  }
+
+  db.exec('SELECT * FROM users_testing WHERE username = ?', [ username ], db.connection, function(err, result, fields) {
+    let parsedResult = JSON.parse(JSON.stringify(result))[0];
+
+    // Unfortunately for annoying security reasons, this is the easiest way I could find to do this.
+    Object.keys(userFields).forEach((key) => {
+      let value = userFields[key];
+
+      let targetField = null;
+      if (key === 'first_name' || key === 'last_name' || key === 'school' || key === 'occupation' || key === 'description') { targetField = key; }
+
+      if (value !== null && targetField !== null) {
+        console.log(`[/api/update_user_info] Setting ${key} to ${value} (${username})`);
+
+        db.exec(`UPDATE users_testing SET ${targetField} = ? WHERE username = ?`, [ value, username ], db.connection, function(err, result, fields) {
+          console.log(err);
+        });
+      }
+    });
+
+    res.status(200).end();
+  });
+});
+
+/**
  * POST /api/create_account
  */
 app.post(app.prefix + 'create_account', (req, res) => {
   let username = req.body.username;
-  let password = req.body.password;
+  let password = req.body.password || null;
+  let firstName = req.body.first_name || null;
+  let lastname = req.body.last_name || null;
 
-  db.exec('SELECT * FROM users WHERE username LIKE ?', [ username ], db.connection, function (err, result, fields) {
+  if (password === null) {
+    res.status(400).end('Error: No password specified');
+  }
+
+  db.exec('SELECT * FROM users_testing WHERE username LIKE ?', [ username ], db.connection, function(err, result, fields) {
     if (err) throw err;
 
     let parsedResult = JSON.parse(JSON.stringify(result))[0];
@@ -132,8 +221,11 @@ app.post(app.prefix + 'create_account', (req, res) => {
     } else { // Create a new account
         console.log('[/api/create_account] Creating new account ' + username + ':' + password);
 
-        db.exec('INSERT INTO users (username, password) VALUES (?, ?)', [ username, password ], db.connection, function (err, result, fields) {
-          res.status(200).end();
+        bcrypt.hash(password, SALT_ROUNDS, function(err, hash) {
+          // Store hash in your password DB.
+          db.exec('INSERT INTO users_testing (username, hash) VALUES (?, ?)', [ username, hash ], db.connection, function(err, result, fields) {
+            res.status(200).end();
+          });
         });
     }
   });
@@ -144,6 +236,8 @@ app.post(app.prefix + 'create_account', (req, res) => {
  * (authentication required)
  */
 app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
+  // TODO: Modularize this mess
+
   let username = req.body.username;
   let transcript = req.body.transcript || undefined;
 
@@ -238,6 +332,11 @@ app.get(app.prefix + 'get_events', (req, res) => {
 });
 
 // New handler for getting NLP events correctly from the database. Should have authentication check but disabled for testing
+/**
+ * GET /api/get_all_events
+ * (authentication required)
+ */
+ // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
 app.get(app.prefix + 'get_all_events', (req, res) => {
   let username = req.query.username;
 
@@ -251,58 +350,51 @@ app.get(app.prefix + 'get_all_events', (req, res) => {
 });
 
 // New handler for deleting NLP generated events from the database.
-
 /**
  * POST /api/delete_event
  * (authentication required)
  */
+ // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
 app.post(app.prefix + 'delete_event', (req, res) => {
   let event_id = req.body.event_id;
   let username = req.body.username;
 
+  // TODO: Return 400 if no events can be deleted
+
   db.exec('DELETE FROM events WHERE event_id LIKE ? and creator LIKE ?', [ event_id, username ], db.connection, function(err, result, fields) {
+    console.log('[/api/get_all_events] Deleted an event');
     res.status(200).end('true');
   });
 });
-
-// UPDATE table_name
-// SET column1 = value1, column2 = value2, ...
-// WHERE condition;
 
 /**
  * POST /api/update_event
  * (authentication required)
  */
+ // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
 app.post(app.prefix + 'update_event', (req, res) => {
   let event_id = req.body.event_id;
   let username = req.body.username
   let eventJSON = req.body.event;
 
   let eventObject;
-  //
-  console.log(event_id, username, eventJSON);
 
   try {
     decoded = decodeURIComponent(eventJSON); // print(eventObject);
-
-    console.log(decoded);
-
     eventObject = JSON.parse((decoded));
-
   } catch (e) {
     console.error(new Error(`Error parsing JSON: {e}`));
 
-    res.status(400).end
+    res.status(400).end('Error parsing JSON')
   }
 
   if (typeof eventObject !== undefined && typeof eventObject.timestamp !== undefined && typeof eventObject.description !== undefined) {
     db.exec('UPDATE events SET timestamp = ?, description = ? WHERE creator = ? AND event_id = ?', [ eventObject.timestamp, eventObject.description, username, event_id ], db.connection, function(err, result, fields) {
       console.log(`Updated!`);
-      res.status(200).end('true');
+      res.status(200).end('updated');
     });
   }
 });
-
 
 /**
  * GET /api/get_links
