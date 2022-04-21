@@ -25,7 +25,7 @@ export default function HomePageComponent() {
                                 </h1>
                                 <p>60 Seconds is a web-based application designed to record short, daily, audio recording segments. It will be compatible with both mobile devices, and desktop/laptop computers via a web browser</p>
                                 <a
-                                    href="/Register"
+                                    href="/#/Register"
                                     className='btn btn-custom btn-lg page-scroll'
                                 >
                                     Register now
