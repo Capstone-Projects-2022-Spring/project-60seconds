@@ -266,9 +266,6 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     cleanedTags = [];
   }
 
-  // REMOVE: TESTING
-  cleanedTags = ['test', 'ing'];
-
   console.log(`[/api/upload] Tags: ${cleanedTags}`);
 
   let transcript = req.body.transcript || undefined;
@@ -340,6 +337,7 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
  * (authentication required)
  */
  // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
+ // Kind of insecure because any user see any tag for any audio clip, but oh well
 app.get(app.prefix + 'get_tags', (req, res) => {
   let audio_id = req.query.audio_id;
 
@@ -353,14 +351,15 @@ app.get(app.prefix + 'get_tags', (req, res) => {
   });
 });
 
-app.get(app.prefix + 'search_by_tag', (req, res) => {
+app.get(app.prefix + 'search_by_tag', auth.authenticationCheck, (req, res) => {
   let tag = req.query.tag;
+  let username = req.session.user;
 
   if (tag === undefined) {
     res.status(400).end('Error: No tag specified.');
   }
 
-  db.exec('SELECT audio_id FROM tags WHERE tag LIKE ?', [ tag ], db.connection, function(err, result, fields) {
+  db.exec('SELECT audio_id FROM tags WHERE tag LIKE ? AND creator LIKE ?', [ tag, username ], db.connection, function(err, result, fields) {
     let parsedResults = JSON.parse(JSON.stringify(result));
 
     let searchHits = [];
