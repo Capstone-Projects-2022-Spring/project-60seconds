@@ -16,7 +16,7 @@ export default function logout(props){
   return(
       <p>User successfully logged out!{setTimeout(function(){
         window.location.href = '/';
-     }, 3000)}</p>
+     }, 2000)}</p>
   )
   
 }
