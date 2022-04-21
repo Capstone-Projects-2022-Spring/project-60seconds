@@ -1,8 +1,8 @@
 // server.js
 // Main file; handles incoming API requests to the server
 
-// TODO: Needs a lot of refactoring; split logic between multiple files, fix vulnerabilities, clean things up
-// TODO: Fix glaring SQL injection vulnerabilities
+// TODO: ===> split logic between multiple files <===
+// TODO: Fix vulnerabilities, clean things up
 
 // const mysql = require('mysql2');
 const crypto = require('crypto');
@@ -91,7 +91,6 @@ app.post(app.prefix + 'login', async (req, res) => {
           bcrypt.compare(password, userObject.hash, function(err, result) {
             if (result === true) {
               // Probably shouldn't print passwords to log files but I'm leaving this here for now
-
               console.log(`[/api/login] Succesful login from ${username}:${password}, creating a new session`);
               req.session.user = req.body.username;
               res.status(200).end(req.body.username);
@@ -161,10 +160,10 @@ app.get(app.prefix + 'get_user_info', (req, res) => {
  * POST /api/update_user_info
  * (authentication required)
  */
-// ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
-app.post(app.prefix + 'update_user_info', (req, res) => {
-  let username = req.session.user || null;
-  username = 'newuser';
+app.post(app.prefix + 'update_user_info', auth.authenticationCheck, (req, res) => {
+  let username = req.session.user;
+
+  // Unfortunately for some weird security reasons (SQL Injection, prototype pollution), I have to do this in a pretty convoluted way.
   let userFields = {
     first_name: req.body.first_name || null,
     last_name: req.body.last_name || null,
@@ -176,7 +175,6 @@ app.post(app.prefix + 'update_user_info', (req, res) => {
   db.exec('SELECT * FROM users_testing WHERE username = ?', [ username ], db.connection, function(err, result, fields) {
     let parsedResult = JSON.parse(JSON.stringify(result))[0];
 
-    // Unfortunately for annoying security reasons, this is the easiest way I could find to do this.
     Object.keys(userFields).forEach((key) => {
       let value = userFields[key];
 
@@ -239,7 +237,6 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
   // TODO: Modularize this mess
 
   let username = req.body.username;
-  let transcript = req.body.transcript || undefined;
 
   if (username === undefined) {
     res.status(400).end('Error: no user specified');
@@ -250,6 +247,31 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     console.log('No files');
     return res.status(400).end('Error: No files were uploaded.');
   }
+
+  // Pretty ugly way of handling this, basically just parse the csv without adding any empty strings
+  let tags = req.body.tags;
+
+  let cleanedTags = [];
+
+  if (tags !== undefined) {
+    tags = tags.split(',');
+    for (let i = 0; i < tags.length; i++) {
+      if (tags[i] !== '') {
+        cleanedTags.push(tags[i]);
+      }
+    }
+
+    cleanedTags = cleanedTags.join(',');
+  } else {
+    cleanedTags = [];
+  }
+
+  // REMOVE: TESTING
+  cleanedTags = ['test', 'ing'];
+
+  console.log(`[/api/upload] Tags: ${cleanedTags}`);
+
+  let transcript = req.body.transcript || undefined;
 
   baseURL =  `https://${conf.host}/audio/`;
 
@@ -267,48 +289,97 @@ app.post(app.prefix + 'upload', auth.authenticationCheck, (req, res) => {
     let audioObject = {
       "link": baseURL + uniqueFileName,
       "creator": username,
-      "tags": "",
-      "transcript": transcript
+      "transcript": transcript || 'none'
     }
 
-    // Legacy handler
-    if (audioObject.transcript === undefined) {
-      console.log(`[/api/upload] Request received with no transcript; using legacy handler`);
-      db.exec('INSERT INTO audio (link, creator, tags) VALUES (?, ?, ?)',
-              [ audioObject.link, audioObject.creator, audioObject.tags ],
-              db.connection,
-              function (err, result, fields) {
+    // Handle transcripts
+    console.log(`[/api/upload] => Transcript received: ${audioObject.transcript}`);
 
-        res.status(200);
-        res.end(JSON.stringify(audioObject));
-      });
-    }
+    db.exec('INSERT INTO audio (link, creator, transcript) VALUES (?, ?, ?)',
+            [ audioObject.link, audioObject.creator, audioObject.transcript ],
+            db.connection,
+            function (err, result, fields) {
+      console.log(`err: ${err}, res: ${JSON.stringify(result)}`);
 
-    // New handler for transcript uploads
-    if (transcript !== undefined) {
-      console.log(`[/api/upload] Request received with transcript; using new handler.`);
-      console.log(`[/api/upload] => Transcript received: ${transcript}`);
+      // Now that the recording has been inserted, the audio_id has been generated and can be retrieved
+      db.exec('SELECT audio_id FROM audio WHERE link LIKE ?', [ audioObject.link ], db.connection, function(err, result, fields) {
+        let parsedResult = JSON.parse(JSON.stringify(result))[0];
+        let audio_id = parsedResult.audio_id;
+        console.log(`[/api/upload] Parsed Result: ${JSON.stringify(parsedResult)}`);
 
-      db.exec('INSERT INTO audio (link, creator, tags, transcript) VALUES (?, ?, ?, ?)',
-              [ audioObject.link, audioObject.creator, audioObject.tags, audioObject.transcript ],
-              db.connection,
-              function (err, result, fields) {
-        // console.log(`err: ${err}, res: ${result}, fields: ${fields}`);
-      });
+        cleanedTags.forEach((tag, i) => {
+          if (tag.length > 50) {
+            res.status(500).end('Error: Tag too long');
+          }
 
-      let events = [];
-      let transcriptEvents = nlp.extractEvents(audioObject.transcript, audioObject.creator);
-      events.push.apply(events, transcriptEvents);
-
-      events.forEach((event, i) => {
-        db.exec('INSERT INTO events (audio_id, creator, timestamp, description) VALUES (?, ?, ?, ?)', [ 0, audioObject.creator, event.time, event.description ], db.connection, function(err, result, fields) {
-          // Do nothing
+          db.exec('INSERT INTO tags (audio_id, tag) VALUES (?, ?)', [ audio_id, tag ], db.connection, function(err, result, fields) {
+            // Do nothing
+          });
         });
-      });
 
-      res.status(200);
-      res.end(JSON.stringify(audioObject));
-    }
+        let events = [];
+        let transcriptEvents = nlp.extractEvents(audioObject.transcript, audioObject.creator);
+        events.push.apply(events, transcriptEvents);
+
+        events.forEach((event, i) => {
+          db.exec('INSERT INTO events (audio_id, creator, timestamp, description) VALUES (?, ?, ?, ?)', [ audio_id, audioObject.creator, event.time, event.description ], db.connection, function(err, result, fields) {
+            // Do nothing
+          });
+        });
+
+      });
+    });
+
+    res.status(200);
+    res.end(JSON.stringify(audioObject));
+  });
+});
+
+/**
+ * GET /api/get_tags
+ * (authentication required)
+ */
+ // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
+app.get(app.prefix + 'get_tags', (req, res) => {
+  let audio_id = req.query.audio_id;
+
+  if (audio_id === undefined) {
+    res.status(400).end('Error: No audio_id specified.');
+  }
+
+  db.exec('SELECT tag FROM tags WHERE audio_id LIKE ?', [ audio_id ], db.connection, function(err, result, fields) {
+    let parsedResult = JSON.parse(JSON.stringify(result));
+    res.status(200).end(JSON.stringify(parsedResult));
+  });
+});
+
+app.get(app.prefix + 'search_by_tag', (req, res) => {
+  let tag = req.query.tag;
+
+  if (tag === undefined) {
+    res.status(400).end('Error: No tag specified.');
+  }
+
+  db.exec('SELECT audio_id FROM tags WHERE tag LIKE ?', [ tag ], db.connection, function(err, result, fields) {
+    let parsedResults = JSON.parse(JSON.stringify(result));
+
+    let searchHits = [];
+
+    parsedResults.forEach((resultObject, i) => {
+      searchHits.push(resultObject.audio_id);
+    });
+
+    let audioObjects = [];
+
+    searchHits.forEach((audio_id, i) => {
+      db.exec('SELECT * FROM audio WHERE audio_id LIKE ?', [ audio_id ], db.connection, function(err, result, fields) {
+        let parsedResult = JSON.parse(JSON.stringify(result));
+        audioObjects.push(parsedResult);
+      });
+    });
+
+    // Very, very hacky way of dealing with this
+    setTimeout(function() { res.status(200).end(JSON.stringify(audioObjects)); }, 1000);
   });
 });
 
