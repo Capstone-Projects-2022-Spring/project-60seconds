@@ -11,7 +11,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Container from '@mui/material/Container';
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import {BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import {HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 
 const appTheme = createTheme({

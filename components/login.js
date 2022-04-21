@@ -136,7 +136,7 @@ export default function Login(props) {
 					</Box>
 					<hr style={{ color: "black", width: 300 }} />
 					<h4> Don't have an account?</h4>
-					<Link underline="none" to="/Register">
+					<Link underline="none" href="/#/Register">
 						<Button
 							variant="outlined"
 							style={{ width: 180, height: 40 }}
