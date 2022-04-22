@@ -10,6 +10,7 @@ import Register from './components/register';
 import Logout from './components/logout';
 import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import React from 'react';
+import EditProfile from "./Pages/EditProfile";
 
 export default function App() {
   
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/Calendar" element={<Calendar/>}/>
         <Route path="/Record" element={<Record/>}/>
         <Route path="/Profile" element={<Profile/>}/>
+        <Route path="/Pages/EditProfile" element={<EditProfile/>}/>
         <Route path="*" element={<ErrorPage/>}/>
       </Routes>
     </Router>
