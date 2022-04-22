@@ -9,10 +9,12 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Container from '@mui/material/Container';
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import {BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-
+import '../styles/searchbar.css';
+import {Search} from "@mui/icons-material";
+import SearchBar from "./searchbar";
 
 const appTheme = createTheme({
     palette: {
@@ -29,7 +31,6 @@ export default function Navbar(props) {
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
     };
-
 
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
@@ -121,7 +122,6 @@ export default function Navbar(props) {
                                 <Button key="About" component={Link} to="/about" onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
                                     About
                                 </Button>
-
                         </Box>
                         {localStorage.getItem("username") ? 
                         <Link to="/Logout" className="menuLink" style={{color: '#fff', textDecoration: "none"}}> <Button color="inherit">{localStorage.getItem("username")} - Logout</Button></Link> :  

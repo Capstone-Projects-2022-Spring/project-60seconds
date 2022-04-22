@@ -5,6 +5,8 @@ import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSa
 import Container from "@mui/material/Container";
 import Box from '@mui/material/Box'
 import Day from '../components/day';
+import SearchBar from "./searchbar";
+
 
 export default function calendar({datesReturned, usernameReturned, eventsReturned}) {
 
@@ -35,8 +37,8 @@ export default function calendar({datesReturned, usernameReturned, eventsReturne
       //console.log(dates);
     const getHeader = () => {
         return (
-            <div className="header">
-                <div 
+        <div className="header">
+            <div
                     className="todayButton"
                     onClick={() => {
                         setSelectedDate(new Date());
@@ -54,7 +56,8 @@ export default function calendar({datesReturned, usernameReturned, eventsReturne
                     onClick={() => setActiveDate(addMonths(activeDate, 1))}
                 />
                 <h2 className="currentMonth">{format(activeDate, "MMMM yyyy")}</h2>
-            </div>
+                <SearchBar/>
+        </div>
         )
     };
     const getWeekDaysNames = () => {
