@@ -82,6 +82,7 @@ export default function Register() {
 						<Grid container spacing={2}>
 							<Grid item xs={12} sm={6}>
 								<TextField
+								required
 									autoComplete="given-name"
 									name="firstName"
 									fullWidth
@@ -92,6 +93,7 @@ export default function Register() {
 							</Grid>
 							<Grid item xs={12} sm={6}>
 								<TextField
+								required
 									fullWidth
 									id="lastName"
 									label="Last Name"
@@ -145,7 +147,7 @@ export default function Register() {
 				<Box>
 					<Typography>
 						Have an account?&nbsp;
-						<Link href="/Login" variant="body2">
+						<Link href="/#/Login" variant="body2">
 							Login Here
 						</Link>
 					</Typography>

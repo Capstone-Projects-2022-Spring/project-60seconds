@@ -8,7 +8,7 @@ import Record from './Pages/Record';
 import ErrorPage from './Pages/ErrorPage';
 import RegisterPage from './Pages/RegisterPage';
 import Logout from './components/logout';
-import {BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {HashRouter as Router, Routes, Route } from 'react-router-dom';
 import React from 'react';
 import EditProfile from "./Pages/EditProfile";
 
