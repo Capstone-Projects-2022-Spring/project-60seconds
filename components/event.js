@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React from "react";
+import Box from '@mui/material/Box'
 import {isSameDay} from 'date-fns';
 
 export default function description({events, date}){
@@ -26,7 +27,7 @@ export default function description({events, date}){
         const listItems = newarray.map((element) => {
             return (
                 <div key={element.eventDate.toLocaleTimeString()}>
-                    <h4>{element.eventDescription} at {element.eventDate.toLocaleTimeString()}</h4>
+                    <Box><h4>{element.eventDescription} at {element.eventDate.toLocaleTimeString()}</h4></Box>
                 </div>
             )
         })

@@ -1,5 +1,4 @@
-import { View, Button } from 'react-native';
-import styles from '../App.style';
+import { Button } from 'react-native';
 import axios from "axios";
 
 export default function playButton({parentToChild2, date}){
