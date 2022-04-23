@@ -67,7 +67,7 @@ router.post('/api/delete_event', (req, res) => {
  // ************** SHOULD HAVE AUTH CHECK, DISABLED FOR TESTING
 router.post('/api/update_event', (req, res) => {
   let event_id = req.body.event_id;
-  let username = req.body.username
+  let username = req.body.username;
   let eventJSON = req.body.event;
 
   let eventObject;
@@ -87,6 +87,39 @@ router.post('/api/update_event', (req, res) => {
       res.status(200).end('updated');
     });
   }
+});
+
+router.post('/api/create_event', (req, res) => {
+  // Accept username as a parameter for testing
+  let username = req.body.username || req.session.username;
+  let timestamp = req.body.timestamp;
+  let description = req.body.description;
+
+  if (username === undefined) {
+    // Again, don't accept username as a paramter for production
+    res.status(400).end('Error: No username specified (through either a post parameter or through the current session user)');
+  }
+
+  if (timestamp === undefined) {
+    res.status(400).end('Error: Must specify a timestamp (in epoch format)');
+  }
+
+  if (description === undefined) {
+    res.status(400).end('Error: Must specify a description');
+  }
+
+  if (description.length > 50) {
+    res.status(400).end('Error: Description must be 50 characters or less');
+
+  }
+
+  db.exec('INSERT INTO events (creator, timestamp, description) VALUES (?, ?, ?)',
+         [ username, timestamp, description ],
+         db.connection, function(err, result, fields) {
+    console.log(`[/api/create_event] ${err}`);
+
+    res.status(200).end('created');
+  });
 });
 
 
