@@ -54,7 +54,7 @@ export default function Calendar() {
                 
                 eventsToChild(eventsReturned);
               })
-              //console.log(events);
+              //console.log(eventsReturned);
             }
           }).catch(function (error) {
             console.log(error);

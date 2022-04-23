@@ -32,7 +32,7 @@ export default function playButton({parentToChild2}){
         );
     } else {
         return(
-            <p>{parentToChild2}</p>
+            <></>
         )
     }
     

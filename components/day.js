@@ -13,22 +13,13 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
   
     let selectedDateString = parentToChild.getFullYear() + '-' + (parentToChild.getMonth()+1) + '-' + parentToChild.getDate();
     let selectedDateStringAsDate = new Date(selectedDateString);
+    let eventsOnDay = [];
 
     //console.log(selectedDateString);
     const [data, setData] = useState('');
-    const [eventDescription, setEventDescription] = useState("No events.");
-    const [eventTime, setEventTime] = useState("");
 
     const parentToChild2 = (linkToSet) => {
       setData(linkToSet.toString());
-    }
-
-    const descriptionToChild = (descToSet) => {
-      setEventDescription(descToSet);
-    }
-
-    const timeToChild = (timeToSet) => {
-      setEventTime(timeToSet);
     }
     
     useEffect(() => {
@@ -57,24 +48,23 @@ export default function Day({parentToChild, usernameReceived, eventsReceived}) {
 
         //event data values are only updated if a day with an associated event is selected
         if(isSameDay(value.eventDate, selectedDateStringAsDate)){
-          stringDescriptionToPass = value.eventDescription;
-          timeStringToPass = value.eventDate.toLocaleTimeString();
+          eventsOnDay.push(entry);
         } 
     })
     
     //event data values are passed with either default values or with associated event data 
-    descriptionToChild(stringDescriptionToPass);
-    timeToChild(timeStringToPass);
+    //descriptionToChild(stringDescriptionToPass);
+    //timeToChild(timeStringToPass);
   })
   
 
   return(
     <div className="dayBox">
       <View style={styles.dayBox}>
-        <h3>{parentToChild.toDateString()}</h3>
+        <h2>{parentToChild.toDateString()}</h2>
             <PlayButton parentToChild2={data}/>
             <DownloadButton parentToChild2={data} date={parentToChild}/>
-            <EventComponent descriptionToChild={eventDescription} time={eventTime}/>
+            <EventComponent events={eventsReceived} date={selectedDateStringAsDate}/>
       </View>
     </div>
   )

@@ -1,16 +1,42 @@
 import React, {useState} from "react";
+import {isSameDay} from 'date-fns';
 
-export default function description({descriptionToChild, time}){
+export default function description({events, date}){
 
-    
-    //console.log(descriptionToChild);
-    if(!descriptionToChild.toString().includes("No") && time !== ""){
+    let localevents = [];
+    let newarray = [];
+
+    Object.entries(events).forEach(entry => {
+        const [key, value] = entry;
+
+        if(isSameDay(value.eventDate, date)){
+          localevents.push(entry);
+        } 
+    })
+
+    localevents.map((item, index) => {
+        item.map((c, i) => {
+            if(c.length !== 1){
+                newarray.push(c);
+            }
+        })
+    })
+
+    if(newarray.length >=1 ){
+        const listItems = newarray.map((element) => {
+            return (
+                <div key={element.eventDate.toLocaleTimeString()}>
+                    <h4>{element.eventDescription} at {element.eventDate.toLocaleTimeString()}</h4>
+                </div>
+            )
+        })
+
         return (
-            <p>{descriptionToChild + " at " + time}</p>
+            <div>{listItems}</div>
         )
     } else {
-        return (
-            <p>{descriptionToChild}</p>
+        return(
+            <h4>No events.</h4>
         )
     }
 }

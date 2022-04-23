@@ -31,7 +31,7 @@ export default function playButton({parentToChild2, date}){
         );
     } else {
         return(
-            <br></br>
+           <></>
         )
     }
 }
