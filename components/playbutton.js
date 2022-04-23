@@ -1,6 +1,5 @@
-import React, {useState} from "react";
-import { View, Button } from 'react-native';
-import styles from '../App.style';
+import React from "react";
+import { Button } from 'react-native';
 import { Audio }  from 'expo-av';
 
 export default function playButton({parentToChild2}){
@@ -28,11 +27,11 @@ export default function playButton({parentToChild2}){
     if(parentToChild2.includes("http")){
         //console.log("true link")
         return (
-            <Button title="Play Sound" onPress={playSound} />
+            <Button title="Play Recording" onPress={playSound} />
         );
     } else {
         return(
-            <p>{parentToChild2}</p>
+            <h4>No recording.</h4>
         )
     }
     
