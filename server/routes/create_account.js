@@ -13,7 +13,7 @@ router.post('/api/create_account', (req, res) => {
   let username = req.body.username || null;
   let password = req.body.password || null;
   let firstName = req.body.first_name || null;
-  let lastname = req.body.last_name || null;
+  let lastName = req.body.last_name || null;
 
   if (password === null || username === null) {
     res.status(400).end('Error: Must specify username and password');
@@ -33,7 +33,7 @@ router.post('/api/create_account', (req, res) => {
 
       bcrypt.hash(password, SALT_ROUNDS, function(err, hash) {
         // Store hash in your password DB.
-        db.exec('INSERT INTO users_testing (username, hash) VALUES (?, ?)', [ username, hash ], db.connection, function(err, result, fields) {
+        db.exec('INSERT INTO users_testing (username, hash, first_name, last_name) VALUES (?, ?, ?, ?)', [ username, hash, firstName, lastName ], db.connection, function(err, result, fields) {
           res.status(200).end();
         });
       });
