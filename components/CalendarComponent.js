@@ -5,7 +5,10 @@ import { format, startOfWeek, addDays, startOfMonth, endOfMonth, endOfWeek, isSa
 import Container from "@mui/material/Container";
 import Box from '@mui/material/Box'
 import Day from '../components/day';
-import SearchBar from "./searchbar";
+import SearchBar from "../components/searchbar";
+import BookData from '../assets/Data.json'
+import {Search as SearchIcon} from "@mui/icons-material";
+
 
 
 export default function calendar({datesReturned, usernameReturned, eventsReturned}) {
@@ -56,7 +59,6 @@ export default function calendar({datesReturned, usernameReturned, eventsReturne
                     onClick={() => setActiveDate(addMonths(activeDate, 1))}
                 />
                 <h2 className="currentMonth">{format(activeDate, "MMMM yyyy")}</h2>
-                <SearchBar/>
         </div>
         )
     };
@@ -146,19 +148,24 @@ export default function calendar({datesReturned, usernameReturned, eventsReturne
     };
 
     return(
-        <div className="calendar">
-            <Box sx={{
-                flexDirection: "row",
-                display: "flex", 
-                alignItems: 'center'
-            }}>
-                <Container maxWidth="md">
-                    {getHeader()}
-                    {getWeekDaysNames()}
-                    {getDates()}
-                </Container>
-                <Day parentToChild={data} usernameReceived={username} eventsReceived={events}/>
-            </Box>
-        </div>
+        <>
+            <div className="calendar">
+                <Box sx={{
+                    flexDirection: "row",
+                    display: "flex",
+                    alignItems: 'center'
+                }}>
+                    <Container maxWidth="md">
+                        {getHeader()}
+                        {getWeekDaysNames()}
+                        {getDates()}
+                    </Container>
+                    <Day parentToChild={data} usernameReceived={username} eventsReceived={events}/>
+                </Box>
+                {/*<div className="search-bar-section">*/}
+                {/*    <SearchBar placeholder={"Search Tagging"} data={BookData}/>*/}
+                {/*</div>*/}
+            </div>
+        </>
     )
 }
