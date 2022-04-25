@@ -7,6 +7,9 @@ import { Recording } from 'expo-av/build/Audio';
 import { StatusBar } from 'expo-status-bar';
 import "@pathofdev/react-tag-input/build/index.css";
 import ReactTagInput from "@pathofdev/react-tag-input";
+import ReactDOM from 'react-dom';
+import Countdown from 'react-countdown';
+
 
 import axios from 'axios';
 import { duration } from '@mui/material';
@@ -23,17 +26,21 @@ recognition.interimResults = false;
 recognition.continuous = true;
 
 
-
-
-
 export default function recorder() {
 
 	const [recording, setRecording] = React.useState();
 	const [recordings, setRecordings] = React.useState([]);
 
 	const [tags, setTags] = React.useState([])
+	const Completionist = () => <span>Times Up!</span>;
+	var timerBool = false;
+
 
 	async function startRecording() {
+
+		timerBool = true;
+		startTimer(timerBool);
+
 		try {
 			console.log('Requesting permissions..');
 			await Audio.requestPermissionsAsync();
@@ -42,6 +49,7 @@ export default function recorder() {
 				playsInSilentModeIOS: true,
 			});
 			console.log('Starting recording..');
+
 			const { recording } = await Audio.Recording.createAsync(
 				Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
 			);
@@ -51,6 +59,9 @@ export default function recorder() {
 		} catch (err) {
 			console.error('Failed to start recording', err);
 		}
+
+
+
 	}
 
 	async function sendToServer(recording, username) {
@@ -131,6 +142,7 @@ export default function recorder() {
 
 		}, 2000);
 		// sendToServer(recording, user.data.username);
+
 	}
 
 	function getDurationFormatted(millis) {
@@ -141,6 +153,32 @@ export default function recorder() {
 		const secondsDisplay = seconds < 10 ? `0${seconds}` : seconds;
 		var formattedDuration = `${minutesDisplay}:${secondsDisplay}`;
 		return formattedDuration;
+	}
+
+	function startTimer() {
+		console.log("BOOL: " + timerBool);
+		const renderer = ({ seconds, completed }) => {
+
+			if (completed) {
+				// Render a completed state
+				return <Completionist />;
+			} else {
+				// Render a countdown
+				return <span>{seconds} Seconds</span>;
+			}
+		};
+
+		if (timerBool == true) {
+			return (
+				<View style={StyleSheet.row}>
+					<Countdown
+						date={Date.now() + 60000}
+						renderer={renderer}
+					/>
+				</View>
+
+			);
+		}
 	}
 
 	function getRecordingLines() {
@@ -165,7 +203,7 @@ export default function recorder() {
 		// Weird trick for inserting periods at natural pause points
 		let periodIndices = [];
 
-		let insertPeriods = function(transcript, periodIndices) {
+		let insertPeriods = function (transcript, periodIndices) {
 			let fixedTranscript = transcript;
 
 			for (let i = periodIndices.length - 1; i >= 0; i--) {
@@ -194,10 +232,10 @@ export default function recorder() {
 
 		if (speech === true) {
 			recognition.start();
-			recognition.addEventListener('end', function(e) {
+			recognition.addEventListener('end', function (e) {
 				globalTranscript = insertPeriods(globalTranscript, periodIndices);
 
-			  periodIndices = [];
+				periodIndices = [];
 
 				document.getElementById('content').innerHTML = globalTranscript;
 				console.log(`[transcription] Recognition 'end' event received. globalTranscript: ${globalTranscript}`);
@@ -212,10 +250,12 @@ export default function recorder() {
 			<Box
 				sx={{
 					marginTop: 8,
+					marginBottom: 8,
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "center",
 				}}>
+				
 				<Button
 					title={recording ? 'Stop Recording' : 'Start Recording'}
 					onPress={recording ? stopRecording : startRecording}
@@ -224,18 +264,21 @@ export default function recorder() {
 					variant="contained"
 					sx={{ mt: 3, mb: 2 }}
 				/>
+
 				{getRecordingLines()}
-				<h1 id='header'>Text To Speech</h1>
 				<div className="words" contentEditable suppressContentEditableWarning>
 					<p id='content'></p>
+
 				</div>
 				<ReactTagInput
 					tags={tags}
 					placeholder="Custom Tagging"
 					onChange={(newTags) => setTags(newTags)}
 				/>
+
+
 			</Box>
-		</Container>
+		</Container >
 
 	);
 }
