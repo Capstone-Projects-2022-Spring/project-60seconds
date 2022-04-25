@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 axios.defaults.withCredentials = true;
 
@@ -36,21 +37,20 @@ export default function Register() {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		console.log({
-			username: data.get("username"),
-			password: data.get("password"),
-		});
 
 		axios
 			.post("https://api.60seconds.io/api/create_account", {
 				username: data.get("username"),
 				password: data.get("password"),
+				first_name: data.get("firstName"),
+				last_name: data.get("lastName"),
 			})
 			.then(function (response) {
 				console.log(response);
 				alert(
-					"User " + data.get("username") + " registered successfully"
+					"User " + data.get("username") + " successfully registered"
 				);
+				window.location.href = "/#/Login"
 			})
 			.catch(function (error) {
 				console.log(error);

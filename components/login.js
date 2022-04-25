@@ -46,10 +46,6 @@ export default function Login(props) {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		console.log({
-			username: data.get("username"),
-			password: data.get("password"),
-		});
 
 		axios
 			.post("https://api.60seconds.io/api/login", {
@@ -57,6 +53,9 @@ export default function Login(props) {
 				password: data.get("password"),
 			})
 			.then(function (response) {
+				console.log(
+					"User "+ data.get("username") +" successfully logged in!"
+			   );
 				console.log(response);
 				localStorage.setItem('username', data.get('username'))
 				navigate("/Profile", {

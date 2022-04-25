@@ -7,23 +7,20 @@ import {Link} from 'react-router-dom';
 import axios from 'axios';
 
 export default function Profile() {
-
-    const [userName, setUserName] = React.useState('');
-	const [firstName, setFirstName] = React.useState('');
-	const [lastName, setLastName] = React.useState('');
-	const [school, setSchool] = React.useState('');
-	const [occupation, setOccupation] = React.useState('');
-	const [aboutMe, setAboutMe] = React.useState('');
+	axios.defaults.withCredentials = true;
+	const [userInfo, setUserInfo] = React.useState('');
 
 	React.useEffect(() => {
-		if(localStorage.getItem('username')) {
-			setUserName(localStorage.getItem('username'))
-			setFirstName(localStorage.getItem('first-name'))
-			setLastName(localStorage.getItem('last-name'))
-			setSchool(localStorage.getItem('school'))
-			setOccupation(localStorage.getItem('occupation'))
-			setAboutMe(localStorage.getItem('about-me'))
-		}
+		axios
+		.get("https://api.60seconds.io/api/get_user_info")
+		.then(function (response) {
+			console.log(response.data);
+			setUserInfo(response.data);
+			
+		})
+		.catch(function (error){
+			console.log(error);
+		})
 	}, []);
 
 
@@ -33,16 +30,16 @@ export default function Profile() {
 			<div className="page-layout">
 				<div className="profile-column">
 					<img src={StockProfilePic} className="profile-picture"/>
-					<h1 className="username">{userName}</h1>
+					<h1 className="username">{userInfo.username}</h1>
 					<div className="profile-column-info">
-						<p className="first-name">First Name: {firstName}</p>
-						<p className="last-name">Last Name: {lastName}</p>
-						<p className="school">School: {school}</p>
-						<p className="occupation">Occupation: {occupation}</p>
+						<p className="first-name">First Name: {userInfo.first_name}</p>
+						<p className="last-name">Last Name: {userInfo.last_name}</p>
+						<p className="school">School: {userInfo.school}</p>
+						<p className="occupation">Occupation: {userInfo.occupation}</p>
 						<p className="basic-info-label">Basic Information</p>
-						<p className="about-me">{aboutMe}</p>
+						<p className="about-me">{userInfo.description}</p>
 						<button className="edit-profile-button">
-							<Link to="/Pages/EditProfile">
+							<Link to="/EditProfile" style={{ textDecoration: "none" , color:"white"}}>
 								Edit Profile
 							</Link>
 						</button>
