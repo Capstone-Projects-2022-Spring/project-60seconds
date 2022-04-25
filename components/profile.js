@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom';
 import axios from 'axios';
 
 export default function Profile() {
-
+	axios.defaults.withCredentials = true;
 	const [userInfo, setUserInfo] = React.useState('');
 
 	React.useEffect(() => {
@@ -37,7 +37,7 @@ export default function Profile() {
 						<p className="basic-info-label">Basic Information</p>
 						<p className="about-me">{userInfo.description}</p>
 						<button className="edit-profile-button">
-							<Link to="/Pages/EditProfile">
+							<Link to="/EditProfile" style={{ textDecoration: "none" , color:"white"}}>
 								Edit Profile
 							</Link>
 						</button>
