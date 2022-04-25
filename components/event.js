@@ -23,13 +23,16 @@ export default function description({events, date}){
         })
     })
 
+    console.log(newarray)
     if(newarray.length >=1 ){
         const listItems = newarray.map((element) => {
-            return (
-                <div key={element.eventDate.toLocaleTimeString()}>
-                    <Box><h4>{element.eventDescription} at {element.eventDate.toLocaleTimeString()}</h4></Box>
-                </div>
-            )
+            if(typeof(element) === "object"){ 
+                return (
+                    <div key={element.eventDate.toLocaleTimeString() + Math.random()}>
+                        <Box><h4>{element.eventDescription} at {element.eventDate.toLocaleTimeString()}</h4></Box>
+                    </div>
+                )
+            }
         })
 
         return (
