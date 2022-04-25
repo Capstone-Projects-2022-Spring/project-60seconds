@@ -28,7 +28,7 @@ function cleanTags(tags) {
     }
   }
 
-  return cleanedTags.join(',');
+  return cleanedTags;
 }
 
 
@@ -56,7 +56,7 @@ router.post('/api/upload', auth.authenticationCheck, (req, res) => {
   let cleanedTags = [];
 
   if (tags !== undefined) {
-    tags = cleanTags(tags)
+    cleanedTags = cleanTags(tags)
   } else {
     cleanedTags = [];
   }
