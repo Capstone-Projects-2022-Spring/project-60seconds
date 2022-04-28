@@ -8,12 +8,19 @@ Once audio segments are recorded, they’ll be available for the user to review 
 Aaron Scofield, Ryan Hardison, Xu Lyu, Zachary Preston, Zack Waxler
 
 # Final Feature List
-
-...
+1. Currently running on a live server, rather than the localhost, visit 60seconds.io
+2. A fully functional register page, as well as a page to edit user profile information (name, school, occupation, etc.)
+3. A speech-to-text transcription service
+4. A fully functional calendar interface, congruent with a live Calendar
+5. A back end API producing Calendar events based on user input via the transcription
+6. Tagging functionality, users can add custom tags to audio recordings
 
 # Known Bugs
-
-...
+1. Taggings sometimes do not show up with the recording
+2. The tags must be added BEFORE recordings audio
+3. The user must hit STOP recording for it to be sent to the backend
+4. Transcriptions sometimes are not accurate with the user input (likely due to the microphone)
+5. The user's profile picture does not save to the backend
 
 # Instructions to Build/Run
 
